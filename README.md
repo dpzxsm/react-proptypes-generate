@@ -47,7 +47,7 @@ This extension contributes the following settings:
 
 Users appreciate release notes as you update your extension.
 
-### 1.0.0-alpha
+### 1.0.0
 
 1. Support Auto Generate
 2. Support Command Line

@@ -2,7 +2,7 @@
     "name": "react-proptypes-prod",
     "displayName": "react-propTypes",
     "description": "Auto generate react's propTypes",
-    "version": "1.0.0-alpha",
+    "version": "1.0.0",
     "publisher": "suming",
     "author": "suming",
     "license": "MIT",
@@ -10,6 +10,7 @@
         "url": "https://github.com/dpzxsm/react-proptypes/issues"
     },
     "homepage": "https://github.com/dpzxsm/react-proptypes",
+    "repository": "https://github.com/dpzxsm/react-proptypes",
     "engines": {
         "vscode": "^1.27.0"
     },
