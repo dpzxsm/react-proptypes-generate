@@ -2,7 +2,7 @@
     "name": "react-proptypes-prod",
     "displayName": "react-propTypes",
     "description": "自动生成propTypes",
-    "version": "1.0.0-alpha",
+    "version": "1.0.0-alpha5",
     "publisher": "suming",
     "author": "suming",
     "license": "MIT",
@@ -21,7 +21,7 @@
     ],
     "main": "./extension",
     "bin": {
-        "web": "./bin/cli.js"
+        "rpg-cli": "./bin/cli.js"
     },
     "contributes": {
         "commands": [
@@ -38,8 +38,8 @@
             }
         ],
         "configuration": {
-            "type" : "object",
-            "title" : "ReactPropTypes configuration",
+            "type": "object",
+            "title": "ReactPropTypes configuration",
             "properties": {
                 "propTypes.autoImport": {
                     "type": "string",

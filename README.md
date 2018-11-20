@@ -2,7 +2,7 @@
   This is the VS Code's extension that automatically generates PropTypes code for React components, like [ReactPropTypes](https://github.com/dpzxsm/ReactPropTypes-Plugin) in the Jetbrains's Platform
 
 
-### Installation
+## Installation
 ### VS Code
   Search react-proptypes in Marketplace and install it
 
@@ -18,8 +18,8 @@ npm install react-proptypes -g
 3. Input propType to replace default type
 
 ### Command Line
-1. `react-proptypes -h` show Help
-2. `react-proptypes <filePath> <componentName>` to generate PropTypes
+1. `rpg-cli -h` show Help
+2. `rpg-cli <filePath> <componentName>` to generate PropTypes
 
 ## Features
 
