@@ -1,8 +1,8 @@
 {
     "name": "react-proptypes-prod",
     "displayName": "react-propTypes",
-    "description": "自动生成propTypes",
-    "version": "1.0.0-alpha11",
+    "description": "Auto generate react's propTypes",
+    "version": "1.0.0-alpha",
     "publisher": "suming",
     "author": "suming",
     "license": "MIT",
