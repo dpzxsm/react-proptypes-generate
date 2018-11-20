@@ -2,7 +2,7 @@
     "name": "react-proptypes-prod",
     "displayName": "react-propTypes",
     "description": "自动生成propTypes",
-    "version": "1.0.0-alpha5",
+    "version": "1.0.0-alpha10",
     "publisher": "suming",
     "author": "suming",
     "license": "MIT",
@@ -57,7 +57,7 @@
     "scripts": {
         "postinstall": "node ./node_modules/vscode/bin/install",
         "compile": "node ./node_modules/vscode/bin/compile",
-        "start": "code --extensionDevelopmentPath=/Users/user/Projects/react-proptypes"
+        "start": "code --extensionDevelopmentPath=/Users/user/sumingProjects/react-proptypes"
     },
     "devDependencies": {
         "typescript": "^2.6.1",
