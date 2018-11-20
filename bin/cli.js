@@ -20,9 +20,6 @@ function run(argv) {
       try {
         let filePath = path.normalize(argv[0]);
         let name = argv[1];
-        if (!path.isAbsolute(filePath)) {
-          filePath = path.join(__dirname, filePath);
-        }
         fs.readFile(filePath, "utf-8", function (err, data) {
           if (!data) {
             console.error('can\'t resolve filePath: ' + filePath);
