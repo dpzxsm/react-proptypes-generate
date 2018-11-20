@@ -1,0 +1,39 @@
+import React, { PureComponent } from 'react';
+export default class Test extends PureComponent {
+  constructor(props) {
+    super(props);
+    this.state = {
+       title: props.title,
+       age: props.age
+    }
+  }
+
+  render() {
+    let { school = "ddd" , age = { name: 2 }} = this.props;
+    return <div
+      age={this.props.age}>
+      {this.props.name}
+      {this.props.hhhh}
+      gegjgg
+    </div>
+  }
+}
+
+Test.propTypes = {
+  a: PropTypes.string,
+  age: PropTypes.object,
+  b: PropTypes.object,
+  dd: PropTypes.string,
+  ggegeg: PropTypes.object,
+  height: PropTypes.number,
+  hhhh: PropTypes.arrayOf(),
+  name: PropTypes.string,
+  school: PropTypes.string,
+  title: PropTypes.oneOfType({
+    a: PropTypes.string,
+    b: PropTypes.object
+  }),
+  zz: PropTypes.func
+}
+
+
