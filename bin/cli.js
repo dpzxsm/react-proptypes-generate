@@ -26,6 +26,7 @@ function run(argv) {
         fs.readFile(filePath, "utf-8", function (err, data) {
           if (!data) {
             console.error('can\'t resolve filePath: ' + filePath);
+            return
           }
           let ast = astHelper.flowAst(data);
           let options = {
