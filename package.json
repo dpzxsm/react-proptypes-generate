@@ -23,7 +23,30 @@
                 "command": "extension.propTypesGenerate",
                 "title": "PropTypes Generate"
             }
-        ]
+        ],
+        "keybindings": [
+            {
+                "command": "extension.propTypesGenerate",
+                "key": "shift+ctrl+alt+p",
+                "mac": "shift+cmd+alt+p"
+            }
+        ],
+        "configuration": {
+            "type" : "object",
+            "title" : "ReactPropTypes configuration",
+            "properties": {
+                "propTypes.autoImport": {
+                    "type": "string",
+                    "default": "Disabled",
+                    "description": "Auto import or require PropTypes module"
+                },
+                "propTypes.codeStyle": {
+                    "type": "string",
+                    "default": "ES6",
+                    "description": "PropTypes Generate Style"
+                }
+            }
+        }
     },
     "scripts": {
         "postinstall": "node ./node_modules/vscode/bin/install",
