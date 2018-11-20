@@ -11,6 +11,7 @@
     },
     "homepage": "https://github.com/dpzxsm/react-proptypes",
     "repository": "https://github.com/dpzxsm/react-proptypes",
+    "icon": "icon.png",
     "engines": {
         "vscode": "^1.27.0"
     },
