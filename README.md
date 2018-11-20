@@ -51,6 +51,3 @@ Users appreciate release notes as you update your extension.
 
 1. Support Auto Generate
 2. Support Command Line
-
-
-**Enjoy!**
