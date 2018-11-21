@@ -57,9 +57,9 @@ function generate() {
       });
     });
   }).then((result) => {
-    result && vscode.window.showInformationMessage("perfect !");
+    // result && vscode.window.showInformationMessage("perfect !");
   }).catch(error => {
-    vscode.window.showWarningMessage(error.toString());
+    vscode.window.showErrorMessage(error.toString());
   });
 
 }
