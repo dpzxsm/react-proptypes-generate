@@ -6,10 +6,11 @@ const Promise = require("bluebird");
 const astHelper = require("../src/astHelper");
 const actions = require("../src/actions");
 const codeBuilder = require("../src/utils/codeBuilder");
+const manifest = require("../package.json");
 
 function run(argv) {
   if (argv[0] === '-v' || argv[0] === '--version') {
-    return "1.0.0";
+    console.log("v" + manifest.version);
   } else if (argv[0] === '-h' || argv[0] === '--help') {
     console.log("\n   Usage: rpg-cli [filePath] [componentName]\n\n" +
       "   Options:\n" +
@@ -23,7 +24,7 @@ function run(argv) {
         fs.readFile(filePath, "utf-8", function (err, data) {
           if (!data) {
             console.error('can\'t resolve filePath: ' + filePath);
-            return
+            return;
           }
           let ast = astHelper.flowAst(data);
           let options = {
