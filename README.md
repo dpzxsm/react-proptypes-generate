@@ -1,4 +1,4 @@
-# react-proptypes
+# react-proptypes-generate
   This is the VS Code's extension that automatically generates PropTypes code for React components, like [ReactPropTypes](https://github.com/dpzxsm/ReactPropTypes-Plugin) in the Jetbrains's Platform
 
 
