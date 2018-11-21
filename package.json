@@ -1,8 +1,8 @@
 {
-    "name": "react-proptypes-prod",
-    "displayName": "react-propTypes",
+    "name": "react-proptypes-generate",
+    "displayName": "React PropTypes Generate",
     "description": "Auto generate react's propTypes",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "publisher": "suming",
     "author": "suming",
     "license": "MIT",
@@ -72,5 +72,15 @@
         "bluebird": "^3.5.3",
         "flow-parser": "^0.86.0",
         "recast": "^0.16.0"
-    }
+    },
+    "keywords":[
+        "react",
+        "proptypes",
+        "React Native",
+        "PropTypes",
+        "generate",
+        "vscode",
+        "ast",
+        "lazy"
+    ]
 }

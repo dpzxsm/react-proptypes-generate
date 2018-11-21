@@ -4,11 +4,11 @@
 
 ## Installation
 ### VS Code
-  Search react-proptypes in Marketplace and install it
+  Search react-proptypes-generate in Marketplace and install it
 
 ### Command Line
 ```
-npm install react-proptypes-prod -g
+npm install react-proptypes-generate -g
 ```
 
 ## Usage
