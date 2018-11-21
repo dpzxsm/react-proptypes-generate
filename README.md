@@ -8,7 +8,7 @@
 
 ### Command Line
 ```
-npm install react-proptypes -g
+npm install react-proptypes-prod -g
 ```
 
 ## Usage
