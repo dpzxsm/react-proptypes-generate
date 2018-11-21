@@ -54,10 +54,10 @@ function generate() {
       });
     });
   }).then(() => {
-    return codeBuilder.getEditRanges(document.getText(), options).then(({ ranges, node }) => {
-      return vscodeHelper.startComplementPropTypes(ranges.map(rangeUtils.getVsCodeRangeByLoc),
-        node ? rangeUtils.getVsCodeRangeByLoc(node.loc) : null);
-    });
+    // return codeBuilder.getEditRanges(document.getText(), options).then(({ ranges, node }) => {
+    //   return vscodeHelper.startComplementPropTypes(ranges.map(rangeUtils.getVsCodeRangeByLoc),
+    //     node ? rangeUtils.getVsCodeRangeByLoc(node.loc) : null);
+    // });
   }).catch(error => {
     vscode.window.showErrorMessage(error.toString());
   });
