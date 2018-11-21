@@ -2,7 +2,7 @@
     "name": "react-proptypes-generate",
     "displayName": "React PropTypes Generate",
     "description": "Auto generate react's propTypes",
-    "version": "1.0.5",
+    "version": "1.0.6",
     "publisher": "suming",
     "author": "suming",
     "license": "MIT",
@@ -73,7 +73,7 @@
         "flow-parser": "^0.86.0",
         "recast": "^0.16.0"
     },
-    "keywords":[
+    "keywords": [
         "react",
         "proptypes",
         "React Native",

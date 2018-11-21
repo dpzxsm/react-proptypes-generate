@@ -64,12 +64,12 @@ function getEditRanges(code, options) {
           let property = item.value.property;
           if (object.type === "Identifier" && object.name === "PropTypes" && property.type === "Identifier") {
             if (property.name === "any") {
-              ranges.push(property.loc);
+              ranges.push(property.range);
             }
           } else if (object.type === "MemberExpression") {
             let name = object.property.name;
             if (name === "any") {
-              ranges.push(object.property.loc);
+              ranges.push(object.property.range);
             }
           }
         }
@@ -78,20 +78,6 @@ function getEditRanges(code, options) {
     return { ranges, node };
   });
 }
-
-// getEditRanges(buildES6PropTypes([
-//   {
-//     name: "A",
-//     type: "any"
-//   }, {
-//     name: "B",
-//     type: "string",
-//     isRequired: true
-//   }
-// ], {
-//   name: "Test"
-// }));
-
 
 exports.buildPropTypes = buildPropTypes;
 exports.getEditRanges = getEditRanges;

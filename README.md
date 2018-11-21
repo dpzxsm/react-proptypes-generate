@@ -32,9 +32,6 @@ This extension contributes the following settings:
 
 ## Release Notes
 
-Users appreciate release notes as you update your extension.
-
-### 1.0.0
-
-1. Support Auto Generate
-2. Support Command Line
+### V1.0
+1. Support VS Code and Command Line
+2. Support Auto Generate Code

@@ -1,4 +1,3 @@
-// @ts-nocheck
 const vscode = require('vscode');
 const actions = require("./actions");
 const Promise = require("bluebird");
@@ -46,20 +45,21 @@ function generate() {
         if (propTypesNode) {
           // replace old object
           let range = rangeUtils.getVsCodeRangeByLoc(propTypesNode.loc);
-          editBuilder.replace(range, code);
         } else {
           // add new object
-          editBuilder.insert(new vscode.Position(classNode.loc.end.line, 0), "\n" + code + "\n");
+          code = "\n" + code + "\n";
         }
+        return codeBuilder.getEditRanges(code, options).then(({ ranges, node }) => {
+          return vscodeHelper.startComplementPropTypes(ranges, propTypesNode ?
+            rangeUtils.getVsCodeRangeByLoc(propTypesNode.loc) : new vscode.Position(classNode.loc.end.line, 0),
+            code);
+        });
       });
     });
-  }).then(() => {
-    // return codeBuilder.getEditRanges(document.getText(), options).then(({ ranges, node }) => {
-    //   return vscodeHelper.startComplementPropTypes(ranges.map(rangeUtils.getVsCodeRangeByLoc),
-    //     node ? rangeUtils.getVsCodeRangeByLoc(node.loc) : null);
-    // });
+  }).then((result) => {
+    result && vscode.window.showInformationMessage("perfect !");
   }).catch(error => {
-    vscode.window.showErrorMessage(error.toString());
+    vscode.window.showWarningMessage(error.toString());
   });
 
 }

@@ -2,45 +2,24 @@ const vscode = require('vscode');
 const Promise = require('bluebird');
 const constants = require("../constants");
 
-const smallNumberDecorationType = vscode.window.createTextEditorDecorationType({
-  borderWidth: '1px',
-  borderStyle: 'solid',
-  overviewRulerColor: 'blue',
-  overviewRulerLane: vscode.OverviewRulerLane.Right,
-  light: {
-    // this color will be used in light color themes
-    borderColor: '#8000FF'
-  },
-  dark: {
-    // this color will be used in dark color themes
-    borderColor: '#DA70D6'
-  }
-});
+function replaceCodeToSnippet(code, index, current) {
+  return code.slice(0, current[0]) + "${" + (index + 1) + ":any}" + code.slice(current[1]);
+}
 
-function startComplementPropTypes(ranges, scrollRange) {
-  let activeEditor = vscode.window.activeTextEditor;
-  if (activeEditor && scrollRange) {
-    activeEditor.revealRange(scrollRange, vscode.TextEditorRevealType.InCenterIfOutsideViewport);
+function startComplementPropTypes(ranges, scrollRange, code) {
+  let snippetStr = ranges.length > 0 ? "" : code;
+  for (let i = 0; i < ranges.length; i++) {
+    let current = ranges[i];
+    let p1 = i > 0 ? ranges[i - 1][1] : 0;
+    let p2 = i < ranges;
+    snippetStr += code.slice(p1, current[0]) + "${" + (i + 1) + ":any}";
+    if (i === ranges.length - 1) {
+      snippetStr += code.slice(current[1]);
+    }
   }
-  return Promise.reduce(ranges, (total, current) => {
-    activeEditor && activeEditor.setDecorations(smallNumberDecorationType, [current]);
-    return vscode.window.showQuickPick(constants.types, {}).then((result) => {
-      activeEditor && activeEditor.setDecorations(smallNumberDecorationType, []);
-      if (!result) {
-        throw new Error("Stop complement !");
-      } else {
-        total.push(current);
-        activeEditor && activeEditor.edit(editBuilder => {
-          editBuilder.replace(current, result);
-        });
-        return total;
-      }
-    });
-  }, []).then(() => {
-    vscode.window.showInformationMessage('Completion');
-  }).catch((error) => {
-    vscode.window.showInformationMessage(error.message);
-  });
+  let snippet = new vscode.SnippetString(snippetStr);
+  let activeEditor = vscode.window.activeTextEditor;
+  activeEditor && activeEditor.insertSnippet(snippet, scrollRange);
 }
 
 exports.startComplementPropTypes = startComplementPropTypes;
