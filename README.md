@@ -26,8 +26,8 @@ npm install react-proptypes-generate -g
 
 This extension contributes the following settings:
 
-* `propTypes.autoImport`: set auto import or require PropTypes module
-* `propTypes.codeStyle`: set the PropTypes Generate Style
+* `propTypes.autoImport`: set auto import or require PropTypes module(disabled|commonJS|ES6)
+* `propTypes.codeStyle`: set the PropTypes Generate Style(default|class)
 
 
 ## Release Notes

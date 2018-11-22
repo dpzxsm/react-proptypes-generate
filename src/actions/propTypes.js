@@ -95,11 +95,12 @@ function findClassNode(ast, { name }) {
 
 function findPropTypesNode(ast, { name, alias }) {
   let propTypesNode;
+  let propTypesClassPropertyNode;
   recast.visit(ast, {
     visitAssignmentExpression: function (path) {
       const node = path.node;
       let left = node.left;
-      if (left.type === "MemberExpression"
+      if (left && left.type === "MemberExpression"
         && left.object.type === "Identifier"
         && left.property.type === "Identifier"
         && left.object.name === name
@@ -107,9 +108,24 @@ function findPropTypesNode(ast, { name, alias }) {
         propTypesNode = node;
       }
       this.traverse(path);
+    },
+    visitClassProperty: function (path) {
+      const node = path.node;
+      let key = node.key;
+      let value = node.value;
+      if (key && value
+        && key.type === 'Identifier'
+        && value.type === 'ObjectExpression'
+        && key.name === (alias || "propTypes")
+        && node.static) {
+        propTypesClassPropertyNode = node;
+      }
+      this.traverse(path);
     }
   });
-  if (propTypesNode) {
+  if (propTypesClassPropertyNode) {
+    return Promise.resolve(propTypesClassPropertyNode);
+  } else if (propTypesNode) {
     return Promise.resolve(propTypesNode);
   } else {
     return Promise.resolve(null);
@@ -125,11 +141,11 @@ function findPropTypesInPropTypeNode(ast) {
         let key = node.key;
         let value = node.value;
         if (key && value && key.type === "Identifier") {
-          if( value.type === "MemberExpression"){
+          if (value.type === "MemberExpression") {
             let props = new PropTypes(key.name);
             propTypesHelper.updatePropTypeFromCode(props, recast.prettyPrint(value).code);
             propTypes.push(props);
-          }else if(value.type === "CallExpression"){
+          } else if (value.type === "CallExpression") {
             let props = new PropTypes(key.name);
             propTypesHelper.updatePropTypeFromCode(props, recast.prettyPrint(value).code);
             propTypes.push(props);

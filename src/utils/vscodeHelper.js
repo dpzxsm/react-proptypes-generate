@@ -1,12 +1,14 @@
 const vscode = require('vscode');
 const Promise = require('bluebird');
 const constants = require("../constants");
+const rangeUtils = require("./rangeUtils");
 
 function replaceCodeToSnippet(code, index, current) {
   return code.slice(0, current[0]) + "${" + (index + 1) + ":any}" + code.slice(current[1]);
 }
 
-function startComplementPropTypes(ranges, scrollRange, code) {
+function startComplementPropTypes(ranges, node, code) {
+  let nodeRange = rangeUtils.getVsCodeRangeByLoc(node.loc);
   let snippetStr = ranges.length > 0 ? "" : code;
   for (let i = 0; i < ranges.length; i++) {
     let current = ranges[i];
@@ -17,9 +19,12 @@ function startComplementPropTypes(ranges, scrollRange, code) {
       snippetStr += code.slice(current[1]);
     }
   }
+  if (node.type === 'ClassProperty') {
+    snippetStr = snippetStr.replace(/([\n|\r])\s{2}/g, "$1")
+  }
   let snippet = new vscode.SnippetString(snippetStr);
   let activeEditor = vscode.window.activeTextEditor;
-  activeEditor && activeEditor.insertSnippet(snippet, scrollRange);
+  activeEditor && activeEditor.insertSnippet(snippet, nodeRange);
 }
 
 exports.startComplementPropTypes = startComplementPropTypes;

@@ -45,12 +45,12 @@
             "properties": {
                 "propTypes.autoImport": {
                     "type": "string",
-                    "default": "Disabled",
+                    "default": "disabled",
                     "description": "Auto import or require PropTypes module"
                 },
                 "propTypes.codeStyle": {
                     "type": "string",
-                    "default": "ES6",
+                    "default": "default",
                     "description": "PropTypes Generate Style"
                 }
             }

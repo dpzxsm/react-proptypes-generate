@@ -5,6 +5,7 @@ const astHelper = require("./astHelper");
 const rangeUtils = require("./utils/rangeUtils");
 const codeBuilder = require("./utils/codeBuilder");
 const vscodeHelper = require("./utils/vscodeHelper");
+const setting = require("./setting");
 
 function generate() {
   const editor = vscode.window.activeTextEditor;
@@ -22,6 +23,8 @@ function generate() {
   const options = {
     name: componentName
   };
+  // merge config to options
+  Object.assign(options, setting.getConfig());
   Promise.all([
     actions.findClassNode(ast, options),
     actions.findPropTypesNode(ast, options),
@@ -40,24 +43,57 @@ function generate() {
       if (propTypes.length === 0) {
         throw new Error("Not find any props");
       }
+      if (propTypesNode) {
+        if (propTypesNode.type === 'AssignmentExpression') {
+          // override old code style
+          options.codeStyle = 'default';
+        } else if (propTypesNode.type === 'ClassProperty') {
+          options.codeStyle = 'class';
+        }
+      }
+      let code = codeBuilder.buildPropTypes(propTypes, options);
       return editor.edit(editBuilder => {
-        let code = codeBuilder.buildPropTypes(propTypes, options);
         if (propTypesNode) {
           // replace old object
           let range = rangeUtils.getVsCodeRangeByLoc(propTypesNode.loc);
+          editBuilder.replace(range, code);
         } else {
           // add new object
-          code = "\n" + code + "\n";
+          let insertPosition;
+          if (options.codeStyle === 'class') {
+            insertPosition = new vscode.Position(classNode.loc.start.line, 0);
+            editBuilder.insert(insertPosition, "  " + code + "\n");
+          } else {
+            insertPosition = new vscode.Position(classNode.loc.end.line, 0);
+            editBuilder.insert(insertPosition, "\n" + code + "\n");
+          }
         }
-        return codeBuilder.getEditRanges(code, options).then(({ ranges, node }) => {
-          return vscodeHelper.startComplementPropTypes(ranges, propTypesNode ?
-            rangeUtils.getVsCodeRangeByLoc(propTypesNode.loc) : new vscode.Position(classNode.loc.end.line, 0),
-            code);
-        });
+      }).then((result) => {
+        if (result) {
+          return {
+            code,
+            classNode,
+            propTypesNode,
+            defaultPropsNode
+          };
+        } else {
+          throw new Error('Refactor Code Error !');
+        }
       });
     });
-  }).then((result) => {
-    // result && vscode.window.showInformationMessage("perfect !");
+  }).then(({ code, propTypesNode, classNode }) => {
+    return codeBuilder.getEditRanges(document.getText(), options).then(({ ranges, node }) => {
+      if (code && node && ranges.length > 0) {
+        let nodeRange = node.range;
+        let newRanges = ranges.map(item => {
+          return [
+            item[0] - nodeRange[0],
+            item[1] - nodeRange[0]
+          ];
+        });
+        vscodeHelper.startComplementPropTypes(newRanges, node, code);
+      }
+    });
   }).catch(error => {
     vscode.window.showErrorMessage(error.toString());
   });
