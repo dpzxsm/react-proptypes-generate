@@ -44,3 +44,4 @@ Command Line can config the following settings:
 ### V1.0
 1. Support VS Code and Command Line
 2. Support Auto Generate Code
+3. Support Config Code Style
