@@ -3,6 +3,7 @@ const Promise = require('bluebird');
 const arrayUtils = require("../utils/arrayUtils");
 const PropTypes = require("../beans/PropTypes");
 const propTypesHelper = require("../utils/propTypesHelper");
+const setting = require("../setting");
 
 function findPropTypes({ classNode, propTypesNode, defaultPropsNode }) {
   return Promise.all([
@@ -59,7 +60,7 @@ function findPropTypesByPropsIdentity(ast, identity) {
                 let propType = new PropTypes(left.name);
                 propType.type = propTypesHelper.getPropTypeByNode(right);
                 if (propType.type !== "any") {
-                  propType.setDefaultValue(recast.prettyPrint(right, { tabWidth: 2 }).code);
+                  propType.setDefaultValue(recast.prettyPrint(right, setting.getCodeStyle()).code);
                 }
                 propTypes.push(propType);
               }
@@ -170,7 +171,7 @@ function findPropTypesInDefaultPropsNode(ast) {
           let props = new PropTypes(key.name);
           props.type = propTypesHelper.getPropTypeByNode(value);
           if (props.type !== "any") {
-            props.setDefaultValue(recast.prettyPrint(value).code);
+            props.setDefaultValue(recast.prettyPrint(value, setting.getCodeStyle()).code);
           }
           propTypes.push(props);
         }

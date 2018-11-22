@@ -16,4 +16,11 @@ function getConfig(key) {
   }
 }
 
+function getCodeStyle() {
+  return {
+    tabWidth: 2
+  }
+}
+
 exports.getConfig = getConfig;
+exports.getCodeStyle = getCodeStyle;

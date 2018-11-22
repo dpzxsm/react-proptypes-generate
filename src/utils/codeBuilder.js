@@ -2,6 +2,7 @@ const recast = require("recast");
 const astHelper = require("../astHelper");
 const actions = require("../actions");
 const constants = require("../constants");
+const setting = require("../setting");
 const {
   assignmentExpression,
   memberExpression,
@@ -56,12 +57,12 @@ function buildObjectExpression(propTypes) {
 function buildES6PropTypes(propTypes, options) {
   let ast = assignmentExpression("=",
     memberExpression(id(options.name), id("propTypes")), buildObjectExpression(propTypes));
-  return recast.prettyPrint(ast, { tabWidth: 2, }).code.replace(/([\n|\r]){2}/g, "$1");
+  return recast.prettyPrint(ast, setting.getCodeStyle()).code.replace(/(\r\n|[\n|\r]){2}/g, "$1");
 }
 
 function buildClassPropTypes(propTypes, options) {
   let ast = classProperty(id('propTypes'), buildObjectExpression(propTypes), null, true);
-  return recast.prettyPrint(ast, { tabWidth: 2, }).code.replace(/([\n|\r]){2}/g, "$1").replace(/([\n|\r])/g, "$1  ");
+  return recast.prettyPrint(ast, setting.getCodeStyle()).code.replace(/(\r\n|[\n|\r]){2}/g, "$1").replace(/([\n|\r])/g, "$1  ");
 }
 
 function buildPropTypes(propTypes, options) {

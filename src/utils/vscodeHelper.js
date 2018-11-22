@@ -20,7 +20,7 @@ function startComplementPropTypes(ranges, node, code) {
     }
   }
   if (node.type === 'ClassProperty') {
-    snippetStr = snippetStr.replace(/([\n|\r])\s{2}/g, "$1")
+    snippetStr = snippetStr.replace(/(\r\n|[\n|\r])\s{2}/g, "$1")
   }
   let snippet = new vscode.SnippetString(snippetStr);
   let activeEditor = vscode.window.activeTextEditor;
