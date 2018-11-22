@@ -1,7 +1,7 @@
-const vscode = require("vscode");
 const otherKeys = ["has", "get", "update", "inspect"];
 
 function getConfig(key) {
+  const vscode = require("vscode");
   if (key) {
     return vscode.workspace.getConfiguration('propTypes').get(key);
   } else {
