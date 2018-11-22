@@ -19,7 +19,8 @@ npm install react-proptypes-generate -g
 
 ### Command Line
 1. `rpg-cli -h` show Help
-2. `rpg-cli <filePath> <componentName>` to generate PropTypes
+2. `rpg-cli <JsFilePath> <ComponentName>` to generate PropTypes
+3. `rpg-cli -c <JsonFilePath>` to config Command Line Settings
 
 
 ## Extension Settings
@@ -29,6 +30,12 @@ This extension contributes the following settings:
 * `propTypes.autoImport`: set auto import or require PropTypes module(disabled|commonJS|ES6)
 * `propTypes.codeStyle`: set the PropTypes Generate Style(default|class)
 
+## Command Line Settings
+
+Command Line can config the following settings:
+
+* `autoImport`: set auto import or require PropTypes module(disabled|commonJS|ES6)
+* `codeStyle`: set the PropTypes Generate Style(default|class)
 
 ## Release Notes
 
