@@ -17,6 +17,8 @@ npm install react-proptypes-generate -g
 2. Press <kbd>command</kbd> + <kbd>.</kbd> (Windows is <kbd>Ctrl</kbd> + <kbd>.</kbd>) show Code Actions and select PropTypesGenerate, or press <kbd>shift</kbd> + <kbd>command</kbd> + <kbd>alt</kbd> + <kbd>P</kbd> (Windows is <kbd>shift</kbd> + <kbd>ctrl</kbd> + <kbd>alt</kbd> + <kbd>P</kbd>) in the macOS
 3. Input propType to replace default type
 
+![img](./ScreenShot.gif)
+
 ### Command Line
 1. `rpg-cli -h` show Help
 2. `rpg-cli <JsFilePath> <ComponentName>` to generate PropTypes
