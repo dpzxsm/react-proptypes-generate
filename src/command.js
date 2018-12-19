@@ -1,4 +1,5 @@
 const vscode = require('vscode');
+const recast = require("recast");1
 const actions = require("./actions");
 const Promise = require("bluebird");
 const astHelper = require("./astHelper");
@@ -71,7 +72,6 @@ function generate() {
       }).then((result) => {
         if (result) {
           return {
-            code,
             classNode,
             propTypesNode,
             defaultPropsNode
@@ -98,10 +98,11 @@ function generate() {
       }
     }
     return lastResult;
-  }).then(({ code, propTypesNode, classNode }) => {
+  }).then(({ propTypesNode, classNode }) => {
     return codeBuilder.getEditRanges(document.getText(), options).then(({ ranges, node }) => {
-      if (code && node && ranges.length > 0) {
+      if (node && ranges.length > 0) {
         let nodeRange = node.range;
+        let code = document.getText().slice(nodeRange[0], nodeRange[1]);
         let newRanges = ranges.map(item => {
           return [
             item[0] - nodeRange[0],
