@@ -10,6 +10,11 @@ const {
   callExpression,
   classProperty,
   identifier: id,
+  variableDeclaration,
+  variableDeclarator,
+  importDeclaration,
+  importDefaultSpecifier,
+  literal,
   property
 } = recast.types.builders;
 
@@ -71,7 +76,20 @@ function buildPropTypes(propTypes, options) {
   } else {
     return buildES6PropTypes(propTypes, options);
   }
+}
 
+function buildImportCode(options) {
+  if (options.autoImport === 'commonJS') {
+    let ast = variableDeclaration('const', [variableDeclarator(id('PropTypes'), callExpression(id('require'), [
+      literal('prop-types')
+    ]))]);
+    return recast.prettyPrint(ast, setting.getCodeStyle()).code;
+  } else if (options.autoImport === 'ES6') {
+    let ast = importDeclaration([importDefaultSpecifier(id('PropTypes'))], literal('prop-types'), 'value');
+    return recast.prettyPrint(ast, setting.getCodeStyle()).code;
+  } else {
+    return "";
+  }
 }
 
 function getEditRanges(code, options) {
@@ -112,4 +130,5 @@ function getEditRanges(code, options) {
 }
 
 exports.buildPropTypes = buildPropTypes;
+exports.buildImportCode = buildImportCode;
 exports.getEditRanges = getEditRanges;
