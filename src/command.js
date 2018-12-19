@@ -1,5 +1,4 @@
 const vscode = require('vscode');
-const recast = require("recast");1
 const actions = require("./actions");
 const Promise = require("bluebird");
 const astHelper = require("./astHelper");
