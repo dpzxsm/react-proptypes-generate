@@ -92,6 +92,17 @@ function run(argv) {
                 }
               }
             });
+          }).then(result => {
+            if (options.autoImport !== 'disable') {
+              let { importNode, requireNode } = actions.findImportOrRequireModuleNode(ast);
+              let firstBody = ast.body[0];
+              let importCode = codeBuilder.buildImportCode(options);
+              if (!importNode && !requireNode && firstBody && importCode) {
+                let insertPosition = firstBody.range[0];
+                return insertCode(filePath, insertPosition, importCode + "\n");
+              }
+            }
+            return result;
           }).then((result) => {
             if (result) {
               console.log('Generated Success!');
@@ -153,5 +164,6 @@ function insertCode(file, position, code) {
     }
   });
 }
+
 
 run(process.argv.slice(2));

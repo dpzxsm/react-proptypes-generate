@@ -1,4 +1,4 @@
 {
-  "autoImport": "disabled",
+  "autoImport": "commonJS",
   "codeStyle": "default"
 }

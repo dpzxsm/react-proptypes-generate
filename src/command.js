@@ -84,15 +84,13 @@ function generate() {
   }).then((lastResult) => {
     if (options.codeStyle !== 'disable') {
       let { importNode, requireNode } = actions.findImportOrRequireModuleNode(ast);
-      if (!importNode && !requireNode) {
+      let firstBody = ast.body[0];
+      let importCode = codeBuilder.buildImportCode(options);
+      if (!importNode && !requireNode && firstBody && importCode) {
         if (options.autoImport && options.autoImport !== 'disabled') {
           return editor.edit(editBuilder => {
-            let importCode = codeBuilder.buildImportCode(options);
-            let firstBody = ast.body[0];
-            if (firstBody) {
-              let insertPosition = new vscode.Position(firstBody.loc.start.line - 1, 0);
-              editBuilder.insert(insertPosition, importCode + "\n");
-            }
+            let insertPosition = new vscode.Position(firstBody.loc.start.line - 1, 0);
+            editBuilder.insert(insertPosition, importCode + "\n");
           }).then(() => {
             return lastResult;
           });
