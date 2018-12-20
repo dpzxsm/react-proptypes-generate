@@ -41,7 +41,9 @@ Command Line can config the following settings:
 
 ## Release Notes
 
-### V1.0
+### V1.1
 1. Support VS Code and Command Line
 2. Support Auto Generate Code
 3. Support Config Code Style
+4. Support Config Auto Import
+5. Fixed Win's OS CRLF

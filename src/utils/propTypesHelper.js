@@ -39,7 +39,7 @@ function getPropTypeByValue(value = "") {
 }
 
 function updatePropTypeFromCode(bean, code) {
-  code = code.replace(/[\n\r]/g, "");
+  code = code.replace(/[\r\n]/g, "");
   let regex = new RegExp("(React)?\\s*\\.?\\s*PropTypes\\s*\\." +
     "\\s*(any|string|object|bool|func|number|array|symbol|node|exact|element|arrayOf|objectOf|oneOf|instanceOf|oneOfType|shape)" +
     "\\s*(\\((.*)\\))?" +
