@@ -41,9 +41,15 @@ Command Line can config the following settings:
 
 ## Release Notes
 
-### V1.1
+### V1.0
 1. Support VS Code and Command Line
 2. Support Auto Generate Code
-3. Support Config Code Style
-4. Support Config Auto Import
-5. Fixed Win's OS CRLF
+
+### V1.1
+1. Support Config Code Style
+2. Support Config Auto Import
+3. Fixed a bug about Windows OS CRLF
+
+### V1.2
+1. Support Pure Component
+2. Fixed a bug that have are multiple component in a file

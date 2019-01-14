@@ -14,8 +14,8 @@ function run(argv) {
   } else if (argv[0] === '-h' || argv[0] === '--help') {
     console.log("\n   Usage: rpg-cli [filePath] [componentName]\n\n" +
       "   Options:\n" +
-      "     -h, --help    output usage information\n" +
-      "     -v, --version    output the version number\n" +
+      "     -h, --help      output usage information\n" +
+      "     -v, --version   output the version number\n" +
       "     -c, --config    config the Code Style, more info you can look at https://github.com/dpzxsm/react-proptypes-generate\n");
   } else if ((argv[0] === '-c' || argv[0] === '--config')) {
     if (argv[1]) {

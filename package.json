@@ -2,7 +2,7 @@
     "name": "react-proptypes-generate",
     "displayName": "React PropTypes Generate",
     "description": "Auto generate react's propTypes",
-    "version": "1.1.2",
+    "version": "1.2.0",
     "publisher": "suming",
     "author": "suming",
     "license": "MIT",
