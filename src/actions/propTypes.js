@@ -22,7 +22,7 @@ function findPropTypesByPropsIdentity(ast, identity = 'props') {
   if (ast.type === 'FunctionDeclaration'
     && ast.params.length > 0
     && ast.params[0].type === 'Identifier'
-  ){
+  ) {
     identity = ast.params[0].name;
   }
   recast.visit(ast, {
@@ -94,7 +94,7 @@ function findComponentNode(ast, { name }) {
     },
     visitFunctionDeclaration: function (path) {
       const node = path.node;
-      if (node.id.name === name) {
+      if (node.id && node.id.type === 'Identifier' && node.id.name === name) {
         componentNode = node;
       }
       this.traverse(path);
