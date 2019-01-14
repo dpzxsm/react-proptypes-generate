@@ -18,13 +18,18 @@
 // }
 
 const PropTypes = require("prop-types");
-export function Test(pp) {
-  const clip = pp.clip;
+export function Test({clip =1, dd}) {
   return (
     <div className="player">
     </div>
   );
 }
+
+Test.propTypes = {
+  clip: PropTypes.number,
+  dd: PropTypes.any
+}
+
 
 
 

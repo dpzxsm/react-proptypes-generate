@@ -21,9 +21,13 @@ function findPropTypesByPropsIdentity(ast, identity = 'props') {
   let propTypes = [];
   if (ast.type === 'FunctionDeclaration'
     && ast.params.length > 0
-    && ast.params[0].type === 'Identifier'
   ) {
-    identity = ast.params[0].name;
+    let firstParams = ast.params[0];
+    if (firstParams.type === 'Identifier') {
+      identity = ast.params[0].name;
+    } else if (firstParams.type === 'ObjectPattern') {
+      propTypes.push(...findPropTypesInObjectPattern(firstParams))
+    }
   }
   recast.visit(ast, {
     visitIdentifier: function (path) {
@@ -53,27 +57,12 @@ function findPropTypesByPropsIdentity(ast, identity = 'props') {
       let node = path.node;
       let idNode = node.id;
       let initNode = node.init;
-      if (idNode && initNode && idNode.type === 'ObjectPattern'
-        && initNode.type === 'MemberExpression' && initNode.property.name === identity) {
-        let properties = idNode.properties || [];
-        for (let i = 0; i < properties.length; i++) {
-          let property = properties[i].value;
-          if (property) {
-            if (property.type === 'AssignmentPattern') {
-              let left = properties[i].value.left;
-              let right = properties[i].value.right;
-              if (left && left.type === "Identifier" && right) {
-                let propType = new PropTypes(left.name);
-                propType.type = propTypesHelper.getPropTypeByNode(right);
-                if (propType.type !== "any") {
-                  propType.setDefaultValue(recast.prettyPrint(right, setting.getCodeStyle()).code);
-                }
-                propTypes.push(propType);
-              }
-            } else if (property.type === 'Identifier') {
-              propTypes.push(new PropTypes(property.name));
-            }
-          }
+      if (idNode && initNode && idNode.type === 'ObjectPattern') {
+        if (
+          (initNode.type === 'MemberExpression' && initNode.property.name === identity) ||
+          (initNode.type === 'Identifier' && initNode.name === identity)
+        ) {
+          propTypes.push(...findPropTypesInObjectPattern(idNode));
         }
       }
       this.traverse(path);
@@ -197,6 +186,31 @@ function findPropTypesInDefaultPropsNode(ast) {
     });
   }
   return Promise.resolve(propTypes);
+}
+
+function findPropTypesInObjectPattern(ast) {
+  let propTypes = [];
+  let properties = ast.properties || [];
+  for (let i = 0; i < properties.length; i++) {
+    let property = properties[i].value;
+    if (property) {
+      if (property.type === 'AssignmentPattern') {
+        let left = properties[i].value.left;
+        let right = properties[i].value.right;
+        if (left && left.type === "Identifier" && right) {
+          let propType = new PropTypes(left.name);
+          propType.type = propTypesHelper.getPropTypeByNode(right);
+          if (propType.type !== "any") {
+            propType.setDefaultValue(recast.prettyPrint(right, setting.getCodeStyle()).code);
+          }
+          propTypes.push(propType);
+        }
+      } else if (property.type === 'Identifier') {
+        propTypes.push(new PropTypes(property.name));
+      }
+    }
+  }
+  return propTypes;
 }
 
 exports.findPropTypes = findPropTypes;

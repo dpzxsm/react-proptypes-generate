@@ -52,4 +52,5 @@ Command Line can config the following settings:
 
 ### V1.2
 1. Support Pure Component
+2. Support ObjectPattern in the Pure Component
 2. Fixed a bug that have are multiple component in a file
