@@ -4,6 +4,6 @@ const autoImport = require('./autoImport');
 module.exports = {
   findPropTypes: propTypes.findPropTypes,
   findPropTypesNode: propTypes.findPropTypesNode,
-  findClassNode: propTypes.findClassNode,
+  findComponentNode: propTypes.findComponentNode,
   findImportOrRequireModuleNode: autoImport.findImportOrRequireModuleNode
 };

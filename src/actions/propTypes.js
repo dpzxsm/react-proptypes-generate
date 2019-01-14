@@ -5,9 +5,9 @@ const PropTypes = require("../beans/PropTypes");
 const propTypesHelper = require("../utils/propTypesHelper");
 const setting = require("../setting");
 
-function findPropTypes({ classNode, propTypesNode, defaultPropsNode }) {
+function findPropTypes({ componentNode, propTypesNode, defaultPropsNode }) {
   return Promise.all([
-    findPropTypesByPropsIdentity(classNode, 'props'),
+    findPropTypesByPropsIdentity(componentNode, 'props'),
     findPropTypesInPropTypeNode(propTypesNode),
     findPropTypesInDefaultPropsNode(defaultPropsNode)
   ]).then((results) => {
@@ -76,19 +76,19 @@ function findPropTypesByPropsIdentity(ast, identity) {
   return Promise.resolve(propTypes);
 }
 
-function findClassNode(ast, { name }) {
-  let classNode;
+function findComponentNode(ast, { name }) {
+  let componentNode;
   recast.visit(ast, {
     visitClassDeclaration: function (path) {
       const node = path.node;
       if (node.id.name === name) {
-        classNode = node;
+        componentNode = node;
       }
       this.traverse(path);
     }
   });
-  if (classNode) {
-    return Promise.resolve(classNode);
+  if (componentNode) {
+    return Promise.resolve(componentNode);
   } else {
     return Promise.reject(new Error('The selected text is not a valid React Component !'));
   }
@@ -183,6 +183,6 @@ function findPropTypesInDefaultPropsNode(ast) {
 }
 
 exports.findPropTypes = findPropTypes;
-exports.findClassNode = findClassNode;
+exports.findComponentNode = findComponentNode;
 exports.findPropTypesNode = findPropTypesNode;
 exports.findPropTypesInPropTypeNode = findPropTypesInPropTypeNode;

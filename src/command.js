@@ -26,17 +26,17 @@ function generate() {
   // merge config to options
   Object.assign(options, setting.getConfig());
   Promise.all([
-    actions.findClassNode(ast, options),
+    actions.findComponentNode(ast, options),
     actions.findPropTypesNode(ast, options),
     actions.findPropTypesNode(ast, Object.assign({}, options, {
       alias: 'defaultProps'
     }))
   ]).then((nodes) => {
-    let classNode = nodes[0];
+    let componentNode = nodes[0];
     let propTypesNode = nodes[1];
     let defaultPropsNode = nodes[2];
     return actions.findPropTypes({
-      classNode,
+      componentNode,
       propTypesNode,
       defaultPropsNode
     }).then((propTypes) => {
@@ -61,17 +61,17 @@ function generate() {
           // add new object
           let insertPosition;
           if (options.codeStyle === 'class') {
-            insertPosition = new vscode.Position(classNode.loc.start.line, 0);
+            insertPosition = new vscode.Position(componentNode.loc.start.line, 0);
             editBuilder.insert(insertPosition, "  " + code + "\n");
           } else {
-            insertPosition = new vscode.Position(classNode.loc.end.line, 0);
+            insertPosition = new vscode.Position(componentNode.loc.end.line, 0);
             editBuilder.insert(insertPosition, "\n" + code + "\n");
           }
         }
       }).then((result) => {
         if (result) {
           return {
-            classNode,
+            componentNode,
             propTypesNode,
             defaultPropsNode
           };
@@ -97,7 +97,7 @@ function generate() {
       }
     }
     return lastResult;
-  }).then(({ propTypesNode, classNode }) => {
+  }).then(({ propTypesNode, componentNode }) => {
     return codeBuilder.getEditRanges(document.getText(), options).then(({ ranges, node }) => {
       if (node && ranges.length > 0) {
         let nodeRange = node.range;
