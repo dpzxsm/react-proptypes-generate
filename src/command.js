@@ -50,6 +50,8 @@ function generate() {
         } else if (propTypesNode.type === 'ClassProperty') {
           options.codeStyle = 'class';
         }
+      }else if(componentNode.type === 'FunctionDeclaration'){
+        options.codeStyle = 'default';
       }
       let code = codeBuilder.buildPropTypes(propTypes, options);
       return editor.edit(editBuilder => {

@@ -51,17 +51,17 @@ function run(argv) {
           // merge config to options
           Object.assign(options, readConfig());
           Promise.all([
-            actions.findClassNode(ast, options),
+            actions.findComponentNode(ast, options),
             actions.findPropTypesNode(ast, options),
             actions.findPropTypesNode(ast, Object.assign({}, options, {
               alias: 'defaultProps'
             }))
           ]).then((nodes) => {
-            let classNode = nodes[0];
+            let componentNode = nodes[0];
             let propTypesNode = nodes[1];
             let defaultPropsNode = nodes[2];
             return actions.findPropTypes({
-              classNode,
+              componentNode,
               propTypesNode,
               defaultPropsNode
             }).then((propTypes) => {
@@ -75,6 +75,8 @@ function run(argv) {
                 } else if (propTypesNode.type === 'ClassProperty') {
                   options.codeStyle = 'class';
                 }
+              }else if(componentNode.type === 'FunctionDeclaration'){
+                options.codeStyle = 'default';
               }
               let code = codeBuilder.buildPropTypes(propTypes, options);
               if (propTypesNode) {
@@ -82,12 +84,12 @@ function run(argv) {
               } else {
                 let insertPosition;
                 if (options.codeStyle === 'class') {
-                  if (classNode.body) {
-                    insertPosition = classNode.body.range[0] + 1;
+                  if (componentNode.body) {
+                    insertPosition = componentNode.body.range[0] + 1;
                     return insertCode(filePath, insertPosition, "\n  " + code + "\n");
                   }
                 } else {
-                  insertPosition = classNode.range[1];
+                  insertPosition = componentNode.range[1];
                   return insertCode(filePath, insertPosition, "\n\n" + code + "\n");
                 }
               }

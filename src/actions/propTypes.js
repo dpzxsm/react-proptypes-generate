@@ -7,7 +7,7 @@ const setting = require("../setting");
 
 function findPropTypes({ componentNode, propTypesNode, defaultPropsNode }) {
   return Promise.all([
-    findPropTypesByPropsIdentity(componentNode, 'props'),
+    findPropTypesByPropsIdentity(componentNode),
     findPropTypesInPropTypeNode(propTypesNode),
     findPropTypesInDefaultPropsNode(defaultPropsNode)
   ]).then((results) => {
@@ -17,8 +17,14 @@ function findPropTypes({ componentNode, propTypesNode, defaultPropsNode }) {
   });
 }
 
-function findPropTypesByPropsIdentity(ast, identity) {
+function findPropTypesByPropsIdentity(ast, identity = 'props') {
   let propTypes = [];
+  if (ast.type === 'FunctionDeclaration'
+    && ast.params.length > 0
+    && ast.params[0].type === 'Identifier'
+  ){
+    identity = ast.params[0].name;
+  }
   recast.visit(ast, {
     visitIdentifier: function (path) {
       let node = path.node;
@@ -85,6 +91,13 @@ function findComponentNode(ast, { name }) {
         componentNode = node;
       }
       this.traverse(path);
+    },
+    visitFunctionDeclaration: function (path) {
+      const node = path.node;
+      if (node.id.name === name) {
+        componentNode = node;
+      }
+      this.traverse(path);
     }
   });
   if (componentNode) {
@@ -119,7 +132,11 @@ function findPropTypesNode(ast, { name, alias }) {
         && value.type === 'ObjectExpression'
         && key.name === (alias || "propTypes")
         && node.static) {
-        propTypesClassPropertyNode = node;
+        let classNode = path.parentPath.parentPath.parentPath.node;
+        if (classNode && classNode.type === 'ClassDeclaration'
+          && classNode.id.name === name) {
+          propTypesClassPropertyNode = node;
+        }
       }
       this.traverse(path);
     }

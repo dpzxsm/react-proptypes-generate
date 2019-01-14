@@ -1,4 +1,4 @@
 {
   "autoImport": "commonJS",
-  "codeStyle": "default"
+  "codeStyle": "class"
 }
