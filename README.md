@@ -51,6 +51,9 @@ Command Line can config the following settings:
 3. Fixed a bug about Windows OS CRLF
 
 ### V1.2
-1. Support Pure Component
-2. Support ObjectPattern in the Pure Component
-2. Fixed a bug that have are multiple component in a file
+1. Support Pure Function Component
+2. Support ObjectPattern in the Pure Function Component
+3. Fixed a bug that have are multiple component in a file
+
+### V1.3
+1. Support Pure ArrowFunction Component

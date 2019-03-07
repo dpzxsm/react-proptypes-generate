@@ -50,7 +50,7 @@ function generate() {
         } else if (propTypesNode.type === 'ClassProperty') {
           options.codeStyle = 'class';
         }
-      }else if(componentNode.type === 'FunctionDeclaration'){
+      }else if(componentNode.type === 'FunctionDeclaration' || componentNode.type === 'ArrowFunctionExpression'){
         options.codeStyle = 'default';
       }
       let code = codeBuilder.buildPropTypes(propTypes, options);

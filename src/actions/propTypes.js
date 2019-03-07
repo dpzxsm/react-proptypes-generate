@@ -19,7 +19,7 @@ function findPropTypes({ componentNode, propTypesNode, defaultPropsNode }) {
 
 function findPropTypesByPropsIdentity(ast, identity = 'props') {
   let propTypes = [];
-  if (ast.type === 'FunctionDeclaration'
+  if ((ast.type === 'FunctionDeclaration' || ast.type === 'ArrowFunctionExpression')
     && ast.params.length > 0
   ) {
     let firstParams = ast.params[0];
@@ -84,6 +84,14 @@ function findComponentNode(ast, { name }) {
     visitFunctionDeclaration: function (path) {
       const node = path.node;
       if (node.id && node.id.type === 'Identifier' && node.id.name === name) {
+        componentNode = node;
+      }
+      this.traverse(path);
+    },
+    visitArrowFunctionExpression: function (path) {
+      const node = path.node;
+      const parentNode =  path.parentPath.node;
+      if(parentNode.type === 'VariableDeclarator' && parentNode.id && parentNode.id.type === 'Identifier' && parentNode.id.name === name){
         componentNode = node;
       }
       this.traverse(path);

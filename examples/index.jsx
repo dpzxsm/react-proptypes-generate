@@ -17,18 +17,22 @@
 //   }
 // }
 
-const PropTypes = require("prop-types");
-export function Test({clip =1, dd}) {
-  return (
-    <div className="player">
-    </div>
-  );
-}
+// const PropTypes = require("prop-types");
+// export function Test({clip =1, dd}) {
+//   return (
+//     <div className="player">
+//     </div>
+//   );
+// }
 
-Test.propTypes = {
-  clip: PropTypes.number,
-  dd: PropTypes.any
-}
+// const Test = () => <div title ={props.title}/>;
+
+
+// Test.propTypes = {
+//   clip: PropTypes.number,
+//   dd: PropTypes.any
+// }
+
 
 
 
