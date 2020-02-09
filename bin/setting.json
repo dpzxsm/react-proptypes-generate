@@ -1,4 +1,4 @@
 {
-  "autoImport": "commonJS",
-  "codeStyle": "class"
+  "autoImport": "ES6",
+  "codeStyle": "default"
 }
