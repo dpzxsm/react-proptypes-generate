@@ -7,10 +7,10 @@
     "author": "suming",
     "license": "MIT",
     "bugs": {
-        "url": "https://github.com/dpzxsm/react-proptypes/issues"
+        "url": "https://github.com/dpzxsm/react-proptypes-generate/issues"
     },
-    "homepage": "https://github.com/dpzxsm/react-proptypes",
-    "repository": "https://github.com/dpzxsm/react-proptypes",
+    "homepage": "https://github.com/dpzxsm/react-proptypes-generate",
+    "repository": "https://github.com/dpzxsm/react-proptypes-generate",
     "icon": "icon.png",
     "engines": {
         "vscode": "^1.27.0"
