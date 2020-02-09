@@ -57,3 +57,7 @@ Command Line can config the following settings:
 
 ### V1.3
 1. Support Pure ArrowFunction Component
+
+### V1.3.1
+1. Auto Import is defaults to ES6
+2. Update the vscode dependencies
