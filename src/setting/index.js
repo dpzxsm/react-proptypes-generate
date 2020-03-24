@@ -1,14 +1,14 @@
-const otherKeys = ["has", "get", "update", "inspect"];
+const otherKeys = ['has', 'get', 'update', 'inspect'];
 
 function getConfig(key) {
-  const vscode = require("vscode");
+  const vscode = require('vscode');
   if (key) {
     return vscode.workspace.getConfiguration('propTypes').get(key);
   } else {
     let config = {};
     let propTypesConfig = vscode.workspace.getConfiguration('propTypes');
     for (let key in propTypesConfig) {
-      if (otherKeys.indexOf(key) === -1) {
+      if (propTypesConfig.hasOwnProperty(key) && otherKeys.indexOf(key) === -1) {
         config[key] = propTypesConfig.get(key);
       }
     }
@@ -18,7 +18,9 @@ function getConfig(key) {
 
 function getCodeStyle() {
   return {
-    tabWidth: 2
+    tabWidth: getConfig('tabWidth') || 2,
+    quote: getConfig('quote') || null,
+    trailingComma: getConfig('trailingComma') || false
   }
 }
 

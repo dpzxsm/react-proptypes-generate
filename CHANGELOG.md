@@ -3,5 +3,33 @@ All notable changes to the "react-proptypes" extension will be documented in thi
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
-## [Unreleased]
-- Initial release
+### [v1.0]
+- Support VS Code and Command Line
+- Support Auto Generate Code
+
+### [v1.1]
+- Support Config Code Style
+- Support Config Auto Import
+- Fixed a bug about Windows OS CRLF
+
+### [v1.2]
+- Support Pure Function Component
+- Support ObjectPattern in the Pure Function Component
+- Fixed a bug that have are multiple component in a file
+
+### [v1.3]
+- Support Pure ArrowFunction Component
+
+### [v1.3.1]
+- Auto Import is defaults to ES6
+- Update the vscode dependencies
+
+### [v1.3.2]
+- Auto Import is defaults to ES6
+- Update the vscode dependencies
+
+### [v1.4.0]
+- Changed the Component'name select way. Use cursor highlighting to select Component's name. Now you can make select Component's name' easier !!!
+- Add more Code Style to configurations.
+- Add configurations to automatically trigger vscode's formatting.
+
