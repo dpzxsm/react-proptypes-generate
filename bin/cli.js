@@ -64,7 +64,7 @@ function run(argv) {
               componentNode,
               propTypesNode,
               defaultPropsNode
-            }).then((propTypes) => {
+            }, options).then((propTypes) => {
               if (propTypes.length === 0) {
                 throw new Error("Not find any props");
               }
@@ -96,7 +96,7 @@ function run(argv) {
             });
           }).then(result => {
             if (options.autoImport !== 'disable') {
-              let { importNode, requireNode } = actions.findImportOrRequireModuleNode(ast);
+              let { importNode, requireNode } = actions.findImportOrRequireModuleNode(ast, options);
               let firstBody = ast.body[0];
               let importCode = codeBuilder.buildImportCode(options);
               if (!importNode && !requireNode && firstBody && importCode) {

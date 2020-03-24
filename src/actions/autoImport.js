@@ -1,7 +1,7 @@
 const recast = require("recast");
 const Promise = require('bluebird');
 
-function findImportOrRequireModuleNode(ast) {
+function findImportOrRequireModuleNode(ast, options) {
   let result = {};
   if (ast) {
     recast.visit(ast, {

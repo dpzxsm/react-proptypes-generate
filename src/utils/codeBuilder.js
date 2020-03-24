@@ -62,12 +62,12 @@ function buildObjectExpression(propTypes) {
 function buildES6PropTypes(propTypes, options) {
   let ast = assignmentExpression("=",
     memberExpression(id(options.name), id("propTypes")), buildObjectExpression(propTypes));
-  return recast.prettyPrint(ast, setting.getCodeStyle()).code.replace(/(\r\n|[\n|\r]){2}/g, "$1");
+  return recast.prettyPrint(ast, setting.getCodeStyle(options)).code.replace(/(\r\n|[\n|\r]){2}/g, "$1");
 }
 
 function buildClassPropTypes(propTypes, options) {
   let ast = classProperty(id('propTypes'), buildObjectExpression(propTypes), null, true);
-  return recast.prettyPrint(ast, setting.getCodeStyle()).code.replace(/(\r\n|[\n|\r]){2}/g, "$1").replace(/([\n|\r])/g, "$1  ");
+  return recast.prettyPrint(ast, setting.getCodeStyle(options)).code.replace(/(\r\n|[\n|\r]){2}/g, "$1").replace(/([\n|\r])/g, "$1  ");
 }
 
 function buildPropTypes(propTypes, options) {
@@ -83,10 +83,10 @@ function buildImportCode(options) {
     let ast = variableDeclaration('const', [variableDeclarator(id('PropTypes'), callExpression(id('require'), [
       literal('prop-types')
     ]))]);
-    return recast.prettyPrint(ast, setting.getCodeStyle()).code;
+    return recast.prettyPrint(ast, setting.getCodeStyle(options)).code;
   } else if (options.autoImport === 'ES6') {
     let ast = importDeclaration([importDefaultSpecifier(id('PropTypes'))], literal('prop-types'), 'value');
-    return recast.prettyPrint(ast, setting.getCodeStyle()).code;
+    return recast.prettyPrint(ast, setting.getCodeStyle(options)).code;
   } else {
     return "";
   }

@@ -16,11 +16,11 @@ function getConfig(key) {
   }
 }
 
-function getCodeStyle() {
+function getCodeStyle(options = {}) {
   return {
-    tabWidth: getConfig('tabWidth') || 2,
-    quote: getConfig('quote') || null,
-    trailingComma: getConfig('trailingComma') || false
+    tabWidth: options.tabWidth || 2,
+    quote: options.quote || null,
+    trailingComma: options.trailingComma || false
   }
 }
 

@@ -15,6 +15,20 @@ export default class Test extends PureComponent {
   }
 }
 
+Test.propTypes = {
+     age: PropTypes.number,
+     info: PropTypes.object,
+     name: PropTypes.string,
+     school: PropTypes.string,
+     title: PropTypes.string,
+}
+
+Test.defaultProps = {
+  age: 22,
+  name: "suming",
+  title: "hello world"
+}
+
 
 // const PropTypes = require("prop-types");
 // export function Test({clip =1, dd}) {

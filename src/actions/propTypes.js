@@ -1,23 +1,24 @@
-const recast = require("recast");
+const recast = require('recast');
 const Promise = require('bluebird');
-const arrayUtils = require("../utils/arrayUtils");
-const PropTypes = require("../beans/PropTypes");
-const propTypesHelper = require("../utils/propTypesHelper");
-const setting = require("../setting");
+const arrayUtils = require('../utils/arrayUtils');
+const PropTypes = require('../beans/PropTypes');
+const propTypesHelper = require('../utils/propTypesHelper');
+const setting = require('../setting');
 
-function findPropTypes({ componentNode, propTypesNode, defaultPropsNode }) {
+function findPropTypes({ componentNode, propTypesNode, defaultPropsNode }, options) {
   return Promise.all([
-    findPropTypesByPropsIdentity(componentNode),
-    findPropTypesInPropTypeNode(propTypesNode),
-    findPropTypesInDefaultPropsNode(defaultPropsNode)
+    findPropTypesByPropsIdentity(componentNode, options),
+    findPropTypesInPropTypeNode(propTypesNode, options),
+    findPropTypesInDefaultPropsNode(defaultPropsNode, options)
   ]).then((results) => {
     return results.reduce((total = [], current = []) => total.concat(current))
       .sort(arrayUtils.sortByKey())
-      .filter(arrayUtils.distinctByKey("name"));
+      .filter(arrayUtils.distinctByKey('name'));
   });
 }
 
-function findPropTypesByPropsIdentity(ast, identity = 'props') {
+function findPropTypesByPropsIdentity(ast, options) {
+  let identity = 'props';
   let propTypes = [];
   if ((ast.type === 'FunctionDeclaration' || ast.type === 'ArrowFunctionExpression')
     && ast.params.length > 0
@@ -26,7 +27,7 @@ function findPropTypesByPropsIdentity(ast, identity = 'props') {
     if (firstParams.type === 'Identifier') {
       identity = ast.params[0].name;
     } else if (firstParams.type === 'ObjectPattern') {
-      propTypes.push(...findPropTypesInObjectPattern(firstParams))
+      propTypes.push(...findPropTypesInObjectPattern(firstParams, options))
     }
   }
   recast.visit(ast, {
@@ -39,13 +40,13 @@ function findPropTypesByPropsIdentity(ast, identity = 'props') {
             let ppNode = path.parentPath.parentPath.node;
             if (ppNode.type === 'MemberExpression') {
               let property = ppNode.property;
-              if (property.type === "Identifier") {
+              if (property.type === 'Identifier') {
                 propTypes.push(new PropTypes(property.name));
               }
             }
           } else if (pNode.object.type === 'Identifier' && pNode.object.name === identity) {
             let property = pNode.property;
-            if (property.type === "Identifier") {
+            if (property.type === 'Identifier') {
               propTypes.push(new PropTypes(property.name));
             }
           }
@@ -71,7 +72,8 @@ function findPropTypesByPropsIdentity(ast, identity = 'props') {
   return Promise.resolve(propTypes);
 }
 
-function findComponentNode(ast, { name }) {
+function findComponentNode(ast, options) {
+  let name = options.name;
   let componentNode;
   recast.visit(ast, {
     visitClassDeclaration: function (path) {
@@ -90,8 +92,8 @@ function findComponentNode(ast, { name }) {
     },
     visitArrowFunctionExpression: function (path) {
       const node = path.node;
-      const parentNode =  path.parentPath.node;
-      if(parentNode.type === 'VariableDeclarator' && parentNode.id && parentNode.id.type === 'Identifier' && parentNode.id.name === name){
+      const parentNode = path.parentPath.node;
+      if (parentNode.type === 'VariableDeclarator' && parentNode.id && parentNode.id.type === 'Identifier' && parentNode.id.name === name) {
         componentNode = node;
       }
       this.traverse(path);
@@ -104,18 +106,19 @@ function findComponentNode(ast, { name }) {
   }
 }
 
-function findPropTypesNode(ast, { name, alias }) {
+function findPropTypesNode(ast, options) {
+  let { name, alias } = options;
   let propTypesNode;
   let propTypesClassPropertyNode;
   recast.visit(ast, {
     visitAssignmentExpression: function (path) {
       const node = path.node;
       let left = node.left;
-      if (left && left.type === "MemberExpression"
-        && left.object.type === "Identifier"
-        && left.property.type === "Identifier"
+      if (left && left.type === 'MemberExpression'
+        && left.object.type === 'Identifier'
+        && left.property.type === 'Identifier'
         && left.object.name === name
-        && left.property.name === (alias || "propTypes")) {
+        && left.property.name === (alias || 'propTypes')) {
         propTypesNode = node;
       }
       this.traverse(path);
@@ -127,7 +130,7 @@ function findPropTypesNode(ast, { name, alias }) {
       if (key && value
         && key.type === 'Identifier'
         && value.type === 'ObjectExpression'
-        && key.name === (alias || "propTypes")
+        && key.name === (alias || 'propTypes')
         && node.static) {
         let classNode = path.parentPath.parentPath.parentPath.node;
         if (classNode && classNode.type === 'ClassDeclaration'
@@ -147,7 +150,7 @@ function findPropTypesNode(ast, { name, alias }) {
   }
 }
 
-function findPropTypesInPropTypeNode(ast) {
+function findPropTypesInPropTypeNode(ast, options) {
   let propTypes = [];
   if (ast) {
     recast.visit(ast, {
@@ -155,12 +158,12 @@ function findPropTypesInPropTypeNode(ast) {
         const node = path.node;
         let key = node.key;
         let value = node.value;
-        if (key && value && key.type === "Identifier") {
-          if (value.type === "MemberExpression") {
+        if (key && value && key.type === 'Identifier') {
+          if (value.type === 'MemberExpression') {
             let props = new PropTypes(key.name);
             propTypesHelper.updatePropTypeFromCode(props, recast.prettyPrint(value).code);
             propTypes.push(props);
-          } else if (value.type === "CallExpression") {
+          } else if (value.type === 'CallExpression') {
             let props = new PropTypes(key.name);
             propTypesHelper.updatePropTypeFromCode(props, recast.prettyPrint(value).code);
             propTypes.push(props);
@@ -173,7 +176,7 @@ function findPropTypesInPropTypeNode(ast) {
   return Promise.resolve(propTypes);
 }
 
-function findPropTypesInDefaultPropsNode(ast) {
+function findPropTypesInDefaultPropsNode(ast, options) {
   let propTypes = [];
   if (ast) {
     recast.visit(ast, {
@@ -181,11 +184,11 @@ function findPropTypesInDefaultPropsNode(ast) {
         const node = path.node;
         let key = node.key;
         let value = node.value;
-        if (key && value && key.type === "Identifier") {
+        if (key && value && key.type === 'Identifier') {
           let props = new PropTypes(key.name);
           props.type = propTypesHelper.getPropTypeByNode(value);
-          if (props.type !== "any") {
-            props.setDefaultValue(recast.prettyPrint(value, setting.getCodeStyle()).code);
+          if (props.type !== 'any') {
+            props.setDefaultValue(recast.prettyPrint(value, setting.getCodeStyle(options)).code);
           }
           propTypes.push(props);
         }
@@ -196,7 +199,7 @@ function findPropTypesInDefaultPropsNode(ast) {
   return Promise.resolve(propTypes);
 }
 
-function findPropTypesInObjectPattern(ast) {
+function findPropTypesInObjectPattern(ast, options) {
   let propTypes = [];
   let properties = ast.properties || [];
   for (let i = 0; i < properties.length; i++) {
@@ -205,11 +208,11 @@ function findPropTypesInObjectPattern(ast) {
       if (property.type === 'AssignmentPattern') {
         let left = properties[i].value.left;
         let right = properties[i].value.right;
-        if (left && left.type === "Identifier" && right) {
+        if (left && left.type === 'Identifier' && right) {
           let propType = new PropTypes(left.name);
           propType.type = propTypesHelper.getPropTypeByNode(right);
-          if (propType.type !== "any") {
-            propType.setDefaultValue(recast.prettyPrint(right, setting.getCodeStyle()).code);
+          if (propType.type !== 'any') {
+            propType.setDefaultValue(recast.prettyPrint(right, setting.getCodeStyle(options)).code);
           }
           propTypes.push(propType);
         }

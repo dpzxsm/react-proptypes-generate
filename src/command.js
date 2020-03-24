@@ -40,7 +40,7 @@ function generate() {
       componentNode,
       propTypesNode,
       defaultPropsNode
-    }).then((propTypes) => {
+    }, options).then((propTypes) => {
       if (propTypes.length === 0) {
         throw new Error('Not find any props');
       }
@@ -85,7 +85,7 @@ function generate() {
     });
   }).then((lastResult) => {
     if (options.codeStyle !== 'disable') {
-      let { importNode, requireNode } = actions.findImportOrRequireModuleNode(ast);
+      let { importNode, requireNode } = actions.findImportOrRequireModuleNode(ast, options);
       let firstBody = ast.body[0];
       let importCode = codeBuilder.buildImportCode(options);
       if (!importNode && !requireNode && firstBody && importCode) {
@@ -106,26 +106,28 @@ function generate() {
         if (setting.getConfig('afterFormat')) {
           let nodeRange = rangeUtils.getVsCodeRangeByLoc(node.loc);
           editor.selection = new vscode.Selection(nodeRange.start, nodeRange.end);
-          return vscode.commands.executeCommand('editor.action.formatSelection')
+          return vscode.commands.executeCommand('editor.action.formatSelection').then(() => true)
         } else {
           return true;
         }
       } else {
-        throw new Error('Can\'t find node!')
+        return false;
       }
     });
-  }).then(() => {
-    return codeBuilder.getEditRanges(document.getText(), options).then(({ ranges, node }) => {
-      let nodeRange = node.range;
-      let code = document.getText().slice(nodeRange[0], nodeRange[1]);
-      let newRanges = ranges.map(item => {
-        return [
-          item[0] - nodeRange[0],
-          item[1] - nodeRange[0]
-        ];
+  }).then((isUndone) => {
+    if (isUndone) {
+      return codeBuilder.getEditRanges(document.getText(), options).then(({ ranges, node }) => {
+        let nodeRange = node.range;
+        let code = document.getText().slice(nodeRange[0], nodeRange[1]);
+        let newRanges = ranges.map(item => {
+          return [
+            item[0] - nodeRange[0],
+            item[1] - nodeRange[0]
+          ];
+        });
+        return vscodeHelper.startComplementPropTypes(newRanges, node, code);
       });
-      return vscodeHelper.startComplementPropTypes(newRanges, node, code);
-    });
+    }
   }).catch(error => {
     vscode.window.showErrorMessage(error.toString());
   });
