@@ -1,4 +1,7 @@
 {
   "autoImport": "ES6",
-  "codeStyle": "default"
+  "codeStyle": "default",
+  "tabWidth": 2,
+  "quote": null,
+  "trailingComma": false
 }

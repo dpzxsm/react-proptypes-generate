@@ -31,6 +31,9 @@ This extension contributes the following settings:
 
 * `propTypes.autoImport`: set auto import or require PropTypes module(disabled|commonJS|ES6)
 * `propTypes.codeStyle`: set the PropTypes Generate Style(default|class)
+* `propTypes.tabWidth`: set the PropTypes Indentation (number)
+* `propTypes.quote`: set the PropTypes Quotes(single|double|auto|null)
+* `propTypes.trailingComma`: set the PropTypes Trailing Commas(boolean)
 
 ## Command Line Settings
 
@@ -38,6 +41,9 @@ Command Line can config the following settings:
 
 * `autoImport`: set auto import or require PropTypes module(disabled|commonJS|ES6)
 * `codeStyle`: set the PropTypes Generate Style(default|class)
+* `tabWidth`: set the PropTypes Indentation (number)
+* `quote`: set the PropTypes Quotes(single|double|auto|null)
+* `trailingComma`: set the PropTypes Trailing Commas(boolean)
 
 ## Release Notes
 
