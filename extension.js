@@ -23,8 +23,23 @@ function activate(context) {
       ]);
     }
   });
+  let codeAction2 = vscode.languages.registerCodeActionsProvider({
+    language: 'javascriptreact',
+    scheme: 'file'
+  }, {
+    provideCodeActions: function () {
+      return Promise.resolve([
+        {
+          command: 'extension.propTypesGenerate',
+          title: 'PropTypesGenerate',
+          tooltip: 'auto generate propTypes',
+        }
+      ]);
+    }
+  });
   context.subscriptions.push(disposable);
   context.subscriptions.push(codeAction);
+  context.subscriptions.push(codeAction2);
 }
 
 exports.activate = activate;
