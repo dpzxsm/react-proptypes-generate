@@ -30,27 +30,13 @@ function findPropTypesByPropsIdentity(ast, options) {
       propTypes.push(...findPropTypesInObjectPattern(firstParams, options))
     }
   }
+
   recast.visit(ast, {
-    visitIdentifier: function (path) {
-      let node = path.node;
-      let pNode = path.parentPath.node;
-      if (node.name === identity && pNode) {
-        if (pNode.type === 'MemberExpression') {
-          if (pNode.object.type === 'ThisExpression') {
-            let ppNode = path.parentPath.parentPath.node;
-            if (ppNode.type === 'MemberExpression') {
-              let property = ppNode.property;
-              if (property.type === 'Identifier') {
-                propTypes.push(new PropTypes(property.name));
-              }
-            }
-          } else if (pNode.object.type === 'Identifier' && pNode.object.name === identity) {
-            let property = pNode.property;
-            if (property.type === 'Identifier') {
-              propTypes.push(new PropTypes(property.name));
-            }
-          }
-        }
+    visitMemberExpression: function (path) {
+      let { propType } = propTypesHelper.getPropTypeByMemberExpression(['this\\.props', 'props'], path);
+      if (propType) {
+        let newPropTypes = findAndCompletePropTypes(path, [propType]);
+        propTypes = propTypesHelper.customMergePropTypes(propTypes, [propType])
       }
       this.traverse(path);
     },
@@ -63,7 +49,8 @@ function findPropTypesByPropsIdentity(ast, options) {
           (initNode.type === 'MemberExpression' && initNode.property.name === identity) ||
           (initNode.type === 'Identifier' && initNode.name === identity)
         ) {
-          propTypes.push(...findPropTypesInObjectPattern(idNode));
+          let newPropTypes = findAndCompletePropTypes(path, findPropTypesInObjectPattern(idNode));
+          propTypes = propTypesHelper.customMergePropTypes(propTypes, newPropTypes)
         }
       }
       this.traverse(path);
@@ -204,24 +191,65 @@ function findPropTypesInObjectPattern(ast, options) {
   let properties = ast.properties || [];
   for (let i = 0; i < properties.length; i++) {
     let property = properties[i].value;
-    if (property) {
+    let key = properties[i].key;
+    if (property && key) {
+      let propType = new PropTypes(key.name);
       if (property.type === 'AssignmentPattern') {
         let left = properties[i].value.left;
         let right = properties[i].value.right;
         if (left && left.type === 'Identifier' && right) {
-          let propType = new PropTypes(left.name);
           propType.type = propTypesHelper.getPropTypeByNode(right);
           if (propType.type !== 'any') {
             propType.setDefaultValue(recast.prettyPrint(right, setting.getCodeStyle(options)).code);
           }
+          propType.setId(left.name);
           propTypes.push(propType);
         }
       } else if (property.type === 'Identifier') {
-        propTypes.push(new PropTypes(property.name));
+        propType.setId(property.name);
+        propTypes.push(propType);
       }
     }
   }
   return propTypes;
+}
+
+// 获取当前函数的块级作用域
+function findBlockStatement(path) {
+  while (true) {
+    if (!path.parent) {
+      return null;
+    }
+    if (path.parent.node.type === 'BlockStatement') {
+      return path.parent.node;
+    } else {
+      return findBlockStatement(path.parent)
+    }
+  }
+}
+
+function findAndCompletePropTypes(path, propTypes) {
+  let newPropTypes = propTypes.slice();
+  let ids = newPropTypes.filter(item => !!item.id).map(item => item.id);
+  let ast = findBlockStatement(path);
+  if (ast) {
+    recast.visit(ast, {
+      visitIdentifier: function (path) {
+        this.traverse(path);
+      },
+      visitMemberExpression: function (path) {
+        let { name, propType } = propTypesHelper.getPropTypeByMemberExpression(ids, path);
+        if (name && propType) {
+          let updatePropType = newPropTypes.find(item => item.name === name);
+          if (updatePropType) {
+            updatePropType.childTypes = propTypesHelper.customMergePropTypes(updatePropType.childTypes, [propType])
+          }
+        }
+        this.traverse(path);
+      },
+    });
+  }
+  return newPropTypes;
 }
 
 exports.findPropTypes = findPropTypes;

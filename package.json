@@ -105,6 +105,7 @@
     },
     "dependencies": {
         "bluebird": "^3.5.3",
+        "deepmerge": "^4.2.2",
         "flow-parser": "^0.86.0",
         "recast": "^0.16.0"
     },
