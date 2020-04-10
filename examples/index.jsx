@@ -19,15 +19,6 @@ export default class Test extends PureComponent {
   }
 }
 
-Test.propTypes = {
-  info: PropTypes.shape({
-    age: PropTypes.any,
-    heihei: PropTypes.any,
-    name: PropTypes.number
-  }),
-  school: PropTypes.string
-}
-
 
 // const PropTypes = require("prop-types");
 // export function Test(props) {
