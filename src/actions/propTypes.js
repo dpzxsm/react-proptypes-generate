@@ -304,7 +304,15 @@ function findAndCompletePropTypes(ast, propTypes) {
   if (ids.length === 0) return;
   if (ast) {
     recast.visit(ast, {
-      visitIdentifier: function (path) {
+      visitCallExpression: function (path) {
+        let node = path.node;
+        let callee = node.callee;
+        if (callee.type === 'Identifier' && ids.indexOf(callee.name) !== -1) {
+          let updatePropType = newPropTypes.find(item => item.name === callee.name);
+          if (updatePropType) {
+            updatePropType.type = 'func'
+          }
+        }
         this.traverse(path);
       },
       visitMemberExpression: function (path) {
@@ -312,8 +320,10 @@ function findAndCompletePropTypes(ast, propTypes) {
         if (name && propType) {
           let updatePropType = newPropTypes.find(item => item.name === name);
           if (updatePropType) {
+            // 这时候说明肯定是复杂类型，所以用shape
             updatePropType.type = 'shape';
-            updatePropType.childTypes = propTypesHelper.customMergePropTypes(updatePropType.childTypes, [propType])
+            let newPropTypes = findAndCompletePropTypes(ast, [propType]);
+            updatePropType.childTypes = propTypesHelper.customMergePropTypes(updatePropType.childTypes, newPropTypes)
           }
         }
         this.traverse(path);
