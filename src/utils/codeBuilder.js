@@ -6,6 +6,7 @@ const setting = require('../setting');
 const {
   assignmentExpression,
   memberExpression,
+  arrayExpression,
   objectExpression,
   callExpression,
   classProperty,
@@ -33,33 +34,44 @@ function deleteAstLoc(ast) {
   }
 }
 
+function buildMemberExpression(item) {
+  if (!item) {
+    return null;
+  }
+  if (constants.specialTypes.indexOf(item.type) >= 0) {
+    let argExpressions = [];
+    if (item.type === 'shape' || item.type === 'exact') {
+      argExpressions.push(buildObjectExpression(item.childTypes))
+    } else if (['arrayOf', 'objectOf', 'instanceOf'].indexOf(item.type) !== -1) {
+      let singleType = buildMemberExpression(item.childTypes[0]);
+      singleType && argExpressions.push(singleType)
+    } else if (item.type === 'oneOf') {
+      if (item.ast) {
+        argExpressions.push(item.ast)
+      }
+    } else if (item.type === 'oneOfType') {
+      argExpressions.push(buildArrayExpression(item.childTypes))
+    } else {
+      return null
+    }
+    let specialAst = callExpression(memberExpression(id('PropTypes'), id(item.type)), argExpressions);
+    return item.isRequired ? memberExpression(specialAst, id('isRequired')) : specialAst
+  } else {
+    return item.isRequired ?
+      memberExpression(memberExpression(id('PropTypes'), id(item.type)), id('isRequired')) :
+      memberExpression(id('PropTypes'), id(item.type))
+  }
+}
+
+function buildArrayExpression(propTypes) {
+  return arrayExpression(propTypes.map(item => {
+    return buildMemberExpression(item)
+  }))
+}
+
 function buildObjectExpression(propTypes) {
   return objectExpression(propTypes.map(item => {
-    if (constants.specialTypes.indexOf(item.type) >= 0) {
-      let argExpressions = [];
-      if (item.type === 'shape' || item.type === 'exact') {
-        argExpressions.push(buildObjectExpression(item.childTypes))
-      } else {
-        if (item.jsonData) {
-          let argAst = astHelper.flowAst('(' + item.jsonData + ')');
-          if (argAst.body && argAst.body.length > 0) {
-            let firstStatement = argAst.body[0];
-            if (firstStatement.type === 'ExpressionStatement') {
-              argExpressions.push(firstStatement.expression);
-            }
-          }
-        }
-      }
-      let specialAst = callExpression(memberExpression(id('PropTypes'), id(item.type)), argExpressions);
-      return property('init', id(item.name), item.isRequired ?
-        memberExpression(specialAst, id('isRequired')) :
-        specialAst);
-    } else {
-      return property('init', id(item.name), item.isRequired ?
-        memberExpression(memberExpression(id('PropTypes'), id(item.type)), id('isRequired')) :
-        memberExpression(id('PropTypes'), id(item.type))
-      );
-    }
+    return property('init', id(item.name), buildMemberExpression(item));
   }));
 }
 

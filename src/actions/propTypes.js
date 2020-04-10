@@ -7,9 +7,9 @@ const setting = require('../setting');
 
 function findPropTypes({ componentNode, propTypesNode, defaultPropsNode }, options) {
   return Promise.all([
-    findPropTypesByPropsIdentity(componentNode, options),
-    findPropTypesInDefaultPropsNode(defaultPropsNode, options),
-    findPropTypesInPropTypeNode(propTypesNode)
+    findPropTypesByPropsIdentity(componentNode, options), //代码生成类型
+    findPropTypesInDefaultPropsNode(defaultPropsNode, options), //默认类型
+    findPropTypesInPropTypeNode(propTypesNode), //优先级最高，必须确保已经填写的PropTypes级别最高
   ]).then((results) => {
     return results.reduce((total = [], current = []) => {
       return propTypesHelper.customMergePropTypes(total, current)
@@ -154,9 +154,13 @@ function findUpdateSpecialPropTypes(typeNode, name) {
       callee = object.callee;
       calleeParams = object.arguments[0];
     } else if (object.type === 'MemberExpression') {
-      props.type = object.property.name;
+      if (object.property.name !== 'any') {
+        props.type = object.property.name;
+      }
     } else if (object.type === 'Identifier') {
-      props.type = property.name;
+      if (property.name !== 'any') {
+        props.type = property.name;
+      }
     }
     // 设置isRequired
     if (property.type === 'Identifier' && property.name === 'isRequired') {
@@ -181,13 +185,20 @@ function findUpdateSpecialPropTypes(typeNode, name) {
       props.childTypes = findPropTypesInObjectNode(calleeParams)
     } else if (calleeParams.type === 'ArrayExpression') {
       // oneOf、oneOfType
-      let elements = calleeParams.elements || [];
-      props.childTypes = elements.map(item => findUpdateSpecialPropTypes(item)).filter(item => !!item);
+      if (props.type === 'oneOf') {
+        // 保存当前的ast
+        props.ast = calleeParams;
+      } else {
+        let elements = calleeParams.elements || [];
+        props.childTypes = elements.map(item => findUpdateSpecialPropTypes(item)).filter(item => !!item);
+      }
     } else if (calleeParams.type === 'MemberExpression') {
       // arrayOf、objectOf、instanceOf
       let property = calleeParams.property;
-      let childTypes = findUpdateSpecialPropTypes(calleeParams);
-      childTypes && (props.childTypes = childTypes)
+      let childType = findUpdateSpecialPropTypes(calleeParams);
+      if (childType) {
+        props.childTypes = [childType]
+      }
     }
   }
 
