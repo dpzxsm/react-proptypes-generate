@@ -28,7 +28,8 @@ function findPropTypesByPropsIdentity(ast, options) {
     if (firstParams.type === 'Identifier') {
       identity = ast.params[0].name;
     } else if (firstParams.type === 'ObjectPattern') {
-      propTypes.push(...findPropTypesInObjectPattern(firstParams, options))
+      let newPropTypes = findAndCompletePropTypes(ast, findPropTypesInObjectPattern(firstParams, options));
+      propTypes = propTypesHelper.customMergePropTypes(propTypes, newPropTypes)
     }
   }
 
@@ -36,7 +37,7 @@ function findPropTypesByPropsIdentity(ast, options) {
     visitMemberExpression: function (path) {
       let { propType } = propTypesHelper.getPropTypeByMemberExpression(['this\\.props', 'props'], path);
       if (propType) {
-        let newPropTypes = findAndCompletePropTypes(path, [propType]);
+        let newPropTypes = findAndCompletePropTypes(findBlockStatement(path), [propType]);
         propTypes = propTypesHelper.customMergePropTypes(propTypes, [propType])
       }
       this.traverse(path);
@@ -50,7 +51,7 @@ function findPropTypesByPropsIdentity(ast, options) {
           (initNode.type === 'MemberExpression' && initNode.property.name === identity) ||
           (initNode.type === 'Identifier' && initNode.name === identity)
         ) {
-          let newPropTypes = findAndCompletePropTypes(path, findPropTypesInObjectPattern(idNode));
+          let newPropTypes = findAndCompletePropTypes(findBlockStatement(path), findPropTypesInObjectPattern(idNode));
           propTypes = propTypesHelper.customMergePropTypes(propTypes, newPropTypes)
         }
       }
@@ -296,12 +297,11 @@ function findBlockStatement(path) {
   }
 }
 
-function findAndCompletePropTypes(path, propTypes) {
+function findAndCompletePropTypes(ast, propTypes) {
   let newPropTypes = propTypes.slice();
   let ids = newPropTypes.filter(item => !!item.id).map(item => item.id);
   // 优化性能，减少查找次数
   if (ids.length === 0) return;
-  let ast = findBlockStatement(path);
   if (ast) {
     recast.visit(ast, {
       visitIdentifier: function (path) {
