@@ -11,9 +11,9 @@ function findPropTypes({ componentNode, propTypesNode, defaultPropsNode }, optio
     findPropTypesInPropTypeNode(propTypesNode, options),
     findPropTypesInDefaultPropsNode(defaultPropsNode, options)
   ]).then((results) => {
-    return results.reduce((total = [], current = []) => total.concat(current))
-      .sort(arrayUtils.sortByKey())
-      .filter(arrayUtils.distinctByKey('name'));
+    let props = results.reduce((total = [], current = []) => propTypesHelper.customMergePropTypes(total, current))
+      .sort(arrayUtils.sortByKey());
+    return props;
   });
 }
 
@@ -175,7 +175,7 @@ function findPropTypesInDefaultPropsNode(ast, options) {
           let props = new PropTypes(key.name);
           props.type = propTypesHelper.getPropTypeByNode(value);
           if (props.type !== 'any') {
-            props.setDefaultValue(recast.prettyPrint(value, setting.getCodeStyle(options)).code);
+            props.defaultValue = recast.prettyPrint(value, setting.getCodeStyle(options)).code
           }
           propTypes.push(props);
         }
@@ -200,13 +200,13 @@ function findPropTypesInObjectPattern(ast, options) {
         if (left && left.type === 'Identifier' && right) {
           propType.type = propTypesHelper.getPropTypeByNode(right);
           if (propType.type !== 'any') {
-            propType.setDefaultValue(recast.prettyPrint(right, setting.getCodeStyle(options)).code);
+            propType.defaultValue = recast.prettyPrint(right, setting.getCodeStyle(options)).code
           }
-          propType.setId(left.name);
+          propType.id = left.name;
           propTypes.push(propType);
         }
       } else if (property.type === 'Identifier') {
-        propType.setId(property.name);
+        propType.id = property.name;
         propTypes.push(propType);
       }
     }

@@ -9,7 +9,7 @@ export default class Test extends PureComponent {
   // }
 
   render() {
-    // let { school: schoolAlias = "schoolName", info = { name: 2 } } = this.props;
+    let { school: schoolAlias = "schoolName", info = { name: 2 } } = this.props;
     let info = this.props.info;
     let heihei = this.props.info.heihei;
     let age = info.age;

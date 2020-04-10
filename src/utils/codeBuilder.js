@@ -18,6 +18,7 @@ const {
   property
 } = recast.types.builders;
 
+
 function deleteAstLoc(ast) {
   for (let key in ast) {
     if (ast.hasOwnProperty(key)) {

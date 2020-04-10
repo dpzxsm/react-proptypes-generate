@@ -32,16 +32,4 @@ PropTypes.prototype = {
   },
 };
 
-PropTypes.prototype.setDefaultValue = function (value) {
-  this.defaultValue = value
-};
-
-PropTypes.prototype.setJsonData = function (value) {
-  this.jsonData = value
-};
-
-PropTypes.prototype.setId = function (value) {
-  this.id = value
-};
-
 module.exports = PropTypes;

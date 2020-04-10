@@ -51,8 +51,8 @@ function updatePropTypeFromCode(bean, code) {
   let m = regex.exec(code);
   if (m) {
     bean.type = m[2] || 'any';
-    if (m[3]) {
-      bean.setJsonData(m[4] || '')
+    if (m[3] && m[4]) {
+      bean.jsonData = m[4];
     }
     bean.isRequired = !!m[5];
   }
@@ -73,8 +73,8 @@ function getPropTypeByMemberExpression(ids, path) {
       }
       lastPropType = propType
     }
-    if(lastPropType && path.parent.node.type === 'VariableDeclarator'){
-      lastPropType.setId(path.parent.node.id.name)
+    if (lastPropType && path.parent.node.type === 'VariableDeclarator') {
+      lastPropType.id = path.parent.node.id.name
     }
     return {
       name: match[1],
@@ -102,9 +102,15 @@ function customMergeChildTypes(target, source) {
 
 // 合并两个PropType对象
 function customMergePropTypes(target, source) {
-  return merge(target, source, {
+  let result = merge(target, source, {
     arrayMerge: customMergeChildTypes
   });
+
+  if (result && !Array.isArray(result)) {
+    // 修改合并后的对象的原型链
+    result.__proto__ = PropTypes.prototype
+  }
+  return result;
 }
 
 exports.getPropTypeByNode = getPropTypeByNode;
