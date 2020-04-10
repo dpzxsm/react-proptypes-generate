@@ -148,16 +148,19 @@ function findUpdateSpecialPropTypes(typeNode, name) {
     callee = typeNode.callee;
     calleeParams = typeNode.arguments[0];
   } else if (typeNode.type === 'MemberExpression') {
-    if (typeNode.object.type === 'CallExpression') {
-      callee = typeNode.object.callee;
-      calleeParams = typeNode.object.arguments[0];
-      if (typeNode.property.type === 'Identifier' && typeNode.property.name === 'isRequired') {
-        props.isRequired = true
-      }
-    } else {
-      // 其他简单类型用正则同一获取
-      propTypesHelper.updatePropTypeFromCode(props, recast.print(typeNode).code);
-      return props
+    let object = typeNode.object;
+    let property = typeNode.property;
+    if (object.type === 'CallExpression') {
+      callee = object.callee;
+      calleeParams = object.arguments[0];
+    } else if (object.type === 'MemberExpression') {
+      props.type = object.property.name;
+    } else if (object.type === 'Identifier') {
+      props.type = property.name;
+    }
+    // 设置isRequired
+    if (property.type === 'Identifier' && property.name === 'isRequired') {
+      props.isRequired = true
     }
   } else {
     // 不符合的类型，返回null
@@ -179,7 +182,7 @@ function findUpdateSpecialPropTypes(typeNode, name) {
     } else if (calleeParams.type === 'ArrayExpression') {
       // oneOf、oneOfType
       let elements = calleeParams.elements || [];
-      props.childTypes = elements.map(findUpdateSpecialPropTypes).filter(item => !!item);
+      props.childTypes = elements.map(item => findUpdateSpecialPropTypes(item)).filter(item => !!item);
     } else if (calleeParams.type === 'MemberExpression') {
       // arrayOf、objectOf、instanceOf
       let property = calleeParams.property;
