@@ -68,6 +68,7 @@ function getPropTypeByMemberExpression(ids, path) {
     for (let i = properties.length - 1; i >= 0; i--) {
       let propType = new PropTypes(properties[i]);
       if (lastPropType) {
+        propType.type = 'shape';
         propType.childTypes = [lastPropType]
       }
       lastPropType = propType
