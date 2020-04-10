@@ -9,9 +9,11 @@ function findPropTypes({ componentNode, propTypesNode, defaultPropsNode }, optio
   return Promise.all([
     findPropTypesByPropsIdentity(componentNode, options),
     findPropTypesInDefaultPropsNode(defaultPropsNode, options),
-    findPropTypesInPropTypeNode(propTypesNode, options)
+    findPropTypesInPropTypeNode(propTypesNode)
   ]).then((results) => {
-    return results.reduce((total = [], current = []) => propTypesHelper.customMergePropTypes(total, current))
+    return results.reduce((total = [], current = []) => {
+      return propTypesHelper.customMergePropTypes(total, current)
+    }, [])
       .sort(arrayUtils.sortByKey());
   });
 }
@@ -55,7 +57,7 @@ function findPropTypesByPropsIdentity(ast, options) {
       this.traverse(path);
     }
   });
-  return Promise.resolve(propTypes);
+  return propTypes;
 }
 
 function findComponentNode(ast, options) {
@@ -100,11 +102,14 @@ function findPropTypesNode(ast, options) {
     visitAssignmentExpression: function (path) {
       const node = path.node;
       let left = node.left;
+      let right = node.right;
       if (left && left.type === 'MemberExpression'
         && left.object.type === 'Identifier'
         && left.property.type === 'Identifier'
         && left.object.name === name
-        && left.property.name === (alias || 'propTypes')) {
+        && left.property.name === (alias || 'propTypes')
+        && right.type === 'ObjectExpression'
+      ) {
         propTypesNode = node;
       }
       this.traverse(path);
@@ -136,30 +141,78 @@ function findPropTypesNode(ast, options) {
   }
 }
 
-function findPropTypesInPropTypeNode(ast, options) {
-  let propTypes = [];
-  if (ast) {
-    recast.visit(ast, {
-      visitProperty: function (path) {
-        const node = path.node;
-        let key = node.key;
-        let value = node.value;
-        if (key && value && key.type === 'Identifier') {
-          if (value.type === 'MemberExpression') {
-            let props = new PropTypes(key.name);
-            propTypesHelper.updatePropTypeFromCode(props, recast.prettyPrint(value).code);
-            propTypes.push(props);
-          } else if (value.type === 'CallExpression') {
-            let props = new PropTypes(key.name);
-            propTypesHelper.updatePropTypeFromCode(props, recast.prettyPrint(value).code);
-            propTypes.push(props);
-          }
-        }
-        this.traverse(path);
+function findUpdateSpecialPropTypes(typeNode, name) {
+  let props = new PropTypes(name);
+  let callee, calleeParams;
+  if (typeNode.type === 'CallExpression') {
+    callee = typeNode.callee;
+    calleeParams = typeNode.arguments[0];
+  } else if (typeNode.type === 'MemberExpression') {
+    if (typeNode.object.type === 'CallExpression') {
+      callee = typeNode.object.callee;
+      calleeParams = typeNode.object.arguments[0];
+      if (typeNode.property.type === 'Identifier' && typeNode.property.name === 'isRequired') {
+        props.isRequired = true
       }
-    });
+    } else {
+      // 其他简单类型用正则同一获取
+      propTypesHelper.updatePropTypeFromCode(props, recast.print(typeNode).code);
+      return props
+    }
+  } else {
+    // 不符合的类型，返回null
+    return null;
   }
-  return Promise.resolve(propTypes);
+
+  // 如果是特殊类型, 在这里统一处理
+  if (callee && calleeParams) {
+    // 设置类型
+    if (callee.type === 'MemberExpression') {
+      let property = callee.property;
+      if (property.type === 'Identifier' && property.name !== 'any') {
+        props.type = property.name;
+      }
+    }
+    if (calleeParams.type === 'ObjectExpression') {
+      // shape or exact
+      props.childTypes = findPropTypesInObjectNode(calleeParams)
+    } else if (calleeParams.type === 'ArrayExpression') {
+      // oneOf、oneOfType
+      let elements = calleeParams.elements || [];
+      props.childTypes = elements.map(findUpdateSpecialPropTypes).filter(item => !!item);
+    } else if (calleeParams.type === 'MemberExpression') {
+      // arrayOf、objectOf、instanceOf
+      let property = calleeParams.property;
+      let childTypes = findUpdateSpecialPropTypes(calleeParams);
+      childTypes && (props.childTypes = childTypes)
+    }
+  }
+
+  // 返回类型
+  return props
+}
+
+function findPropTypesInObjectNode(objectNode) {
+  let propTypes = [];
+  if (objectNode && objectNode.type === 'ObjectExpression') {
+    let properties = objectNode.properties || [];
+    for (let i = 0; i < properties.length; i++) {
+      let key = properties[i].key;
+      let value = properties[i].value;
+      propTypes.push(findUpdateSpecialPropTypes(value, key.name));
+    }
+  }
+  return propTypes;
+}
+
+function findPropTypesInPropTypeNode(propNode) {
+  if (propNode.type === 'ClassProperty' && propNode.static) {
+    return findPropTypesInObjectNode(propNode.value)
+  } else if (propNode.type === 'AssignmentExpression') {
+    return findPropTypesInObjectNode(propNode.right)
+  } else {
+    return []
+  }
 }
 
 function findPropTypesInDefaultPropsNode(ast, options) {
@@ -182,7 +235,7 @@ function findPropTypesInDefaultPropsNode(ast, options) {
       }
     });
   }
-  return Promise.resolve(propTypes);
+  return propTypes;
 }
 
 function findPropTypesInObjectPattern(ast, options) {

@@ -1,5 +1,7 @@
 function PropTypes(name, type, isRequired, childTypes) {
-  this.name = name;
+  if (name) {
+    this._name = name;
+  }
   if (type) {
     this._type = type;
   }
@@ -12,6 +14,12 @@ function PropTypes(name, type, isRequired, childTypes) {
 }
 
 PropTypes.prototype = {
+  get name() {
+    return this._name
+  },
+  set name(value) {
+    this._name = value;
+  },
   get type() {
     return this._type || 'any'
   },
