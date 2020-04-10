@@ -3,16 +3,10 @@ const merge = require('deepmerge');
 const recast = require('recast');
 const arrayUtils = require('./arrayUtils');
 
-function isBool(value) {
-  return !!value.match(/true|false/);
-}
-
-function isNumeric(value) {
-  return !!value.match(/-?[0-9]+.?[0-9]*/);
-}
-
 function updatePropTypeByNode(node, propType) {
-  if (node.type === 'CallExpression' || node.type === 'ArrowFunctionExpression') {
+  if (node.type === 'CallExpression'
+   || node.type === 'FunctionExpression'
+   || node.type === 'ArrowFunctionExpression') {
     propType.type = 'func';
   } else if (node.type === 'ObjectExpression') {
     propType.type = 'shape';
@@ -32,13 +26,11 @@ function updatePropTypeByNode(node, propType) {
     propType.type = 'array';
   } else if (node.type === 'Literal') {
     let value = node.raw;
-    if (value.startsWith('"') && value.endsWith('"')) {
+    if (typeof value === 'string') {
       propType.type = 'string';
-    } else if (value.startsWith('\'') && value.endsWith('\'')) {
-      propType.type = 'string';
-    } else if (isBool(value)) {
+    } else if (typeof value === 'boolean') {
       propType.type = 'bool';
-    } else if (isNumeric(value)) {
+    } else if (typeof value === 'number') {
       propType.type = 'number';
     }
   }
