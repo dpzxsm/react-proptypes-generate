@@ -25,7 +25,7 @@ function updatePropTypeByNode(node, propType) {
   } else if (node.type === 'ArrayExpression') {
     propType.type = 'array';
   } else if (node.type === 'Literal') {
-    let value = node.raw;
+    let value = node.value;
     if (typeof value === 'string') {
       propType.type = 'string';
     } else if (typeof value === 'boolean') {
