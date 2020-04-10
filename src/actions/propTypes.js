@@ -8,8 +8,8 @@ const setting = require('../setting');
 function findPropTypes({ componentNode, propTypesNode, defaultPropsNode }, options) {
   return Promise.all([
     findPropTypesByPropsIdentity(componentNode, options),
-    findPropTypesInPropTypeNode(propTypesNode, options),
-    findPropTypesInDefaultPropsNode(defaultPropsNode, options)
+    findPropTypesInDefaultPropsNode(defaultPropsNode, options),
+    findPropTypesInPropTypeNode(propTypesNode, options)
   ]).then((results) => {
     return results.reduce((total = [], current = []) => propTypesHelper.customMergePropTypes(total, current))
       .sort(arrayUtils.sortByKey());
@@ -229,6 +229,8 @@ function findBlockStatement(path) {
 function findAndCompletePropTypes(path, propTypes) {
   let newPropTypes = propTypes.slice();
   let ids = newPropTypes.filter(item => !!item.id).map(item => item.id);
+  // 优化性能，减少查找次数
+  if (ids.length === 0) return;
   let ast = findBlockStatement(path);
   if (ast) {
     recast.visit(ast, {

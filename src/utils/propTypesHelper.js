@@ -5,8 +5,8 @@ const arrayUtils = require('./arrayUtils');
 
 function updatePropTypeByNode(node, propType) {
   if (node.type === 'CallExpression'
-   || node.type === 'FunctionExpression'
-   || node.type === 'ArrowFunctionExpression') {
+    || node.type === 'FunctionExpression'
+    || node.type === 'ArrowFunctionExpression') {
     propType.type = 'func';
   } else if (node.type === 'ObjectExpression') {
     propType.type = 'shape';
@@ -45,11 +45,15 @@ function updatePropTypeFromCode(bean, code) {
     '\\s*\\.?\\s*(isRequired)?$');
   let m = regex.exec(code);
   if (m) {
-    bean.type = m[2] || 'any';
+    if (m[2] && m[2] !== 'any') {
+      bean.type = m[2];
+    }
     if (m[3] && m[4]) {
       bean.jsonData = m[4];
     }
-    bean.isRequired = !!m[5];
+    if (!!m[5]) {
+      bean.isRequired = true;
+    }
   }
   return bean;
 }

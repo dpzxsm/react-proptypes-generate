@@ -1,8 +1,8 @@
-const recast = require("recast");
-const astHelper = require("../astHelper");
-const actions = require("../actions");
-const constants = require("../constants");
-const setting = require("../setting");
+const recast = require('recast');
+const astHelper = require('../astHelper');
+const actions = require('../actions');
+const constants = require('../constants');
+const setting = require('../setting');
 const {
   assignmentExpression,
   memberExpression,
@@ -22,10 +22,10 @@ const {
 function deleteAstLoc(ast) {
   for (let key in ast) {
     if (ast.hasOwnProperty(key)) {
-      if (key === "loc" || key === 'range') {
+      if (key === 'loc' || key === 'range') {
         ast[key] = null;
       } else {
-        if (typeof (ast[key]) == "object") {
+        if (typeof (ast[key]) == 'object') {
           deleteAstLoc(ast[key]);
         }
       }
@@ -37,38 +37,41 @@ function buildObjectExpression(propTypes) {
   return objectExpression(propTypes.map(item => {
     if (constants.specialTypes.indexOf(item.type) >= 0) {
       let argExpressions = [];
-      if (item.jsonData) {
-        let argAst = astHelper.flowAst("(" + item.jsonData + ")");
-        if (argAst.body && argAst.body.length > 0) {
-          let firstStatement = argAst.body[0];
-          if (firstStatement.type === "ExpressionStatement") {
-            // deleteAstLoc(firstStatement);
-            argExpressions.push(firstStatement.expression);
+      if (item.type === 'shape' || item.type === 'exact') {
+        argExpressions.push(buildObjectExpression(item.childTypes))
+      } else {
+        if (item.jsonData) {
+          let argAst = astHelper.flowAst('(' + item.jsonData + ')');
+          if (argAst.body && argAst.body.length > 0) {
+            let firstStatement = argAst.body[0];
+            if (firstStatement.type === 'ExpressionStatement') {
+              argExpressions.push(firstStatement.expression);
+            }
           }
         }
       }
-      let specialAst = callExpression(memberExpression(id("PropTypes"), id(item.type)), argExpressions);
-      return property("init", id(item.name), item.isRequired ?
-        memberExpression(specialAst, id("isRequired")) :
+      let specialAst = callExpression(memberExpression(id('PropTypes'), id(item.type)), argExpressions);
+      return property('init', id(item.name), item.isRequired ?
+        memberExpression(specialAst, id('isRequired')) :
         specialAst);
     } else {
-      return property("init", id(item.name), item.isRequired ?
-        memberExpression(memberExpression(id("PropTypes"), id(item.type)), id("isRequired")) :
-        memberExpression(id("PropTypes"), id(item.type))
+      return property('init', id(item.name), item.isRequired ?
+        memberExpression(memberExpression(id('PropTypes'), id(item.type)), id('isRequired')) :
+        memberExpression(id('PropTypes'), id(item.type))
       );
     }
   }));
 }
 
 function buildES6PropTypes(propTypes, options) {
-  let ast = assignmentExpression("=",
-    memberExpression(id(options.name), id("propTypes")), buildObjectExpression(propTypes));
-  return recast.prettyPrint(ast, setting.getCodeStyle(options)).code.replace(/(\r\n|[\n|\r]){2}/g, "$1");
+  let ast = assignmentExpression('=',
+    memberExpression(id(options.name), id('propTypes')), buildObjectExpression(propTypes));
+  return recast.prettyPrint(ast, setting.getCodeStyle(options)).code.replace(/(\r\n|[\n|\r]){2}/g, '$1');
 }
 
 function buildClassPropTypes(propTypes, options) {
   let ast = classProperty(id('propTypes'), buildObjectExpression(propTypes), null, true);
-  return recast.prettyPrint(ast, setting.getCodeStyle(options)).code.replace(/(\r\n|[\n|\r]){2}/g, "$1").replace(/([\n|\r])/g, "$1  ");
+  return recast.prettyPrint(ast, setting.getCodeStyle(options)).code.replace(/(\r\n|[\n|\r]){2}/g, '$1').replace(/([\n|\r])/g, '$1  ');
 }
 
 function buildPropTypes(propTypes, options) {
@@ -89,7 +92,7 @@ function buildImportCode(options) {
     let ast = importDeclaration([importDefaultSpecifier(id('PropTypes'))], literal('prop-types'), 'value');
     return recast.prettyPrint(ast, setting.getCodeStyle(options)).code;
   } else {
-    return "";
+    return '';
   }
 }
 
@@ -99,23 +102,23 @@ function getEditRanges(code, options) {
     let ranges = [];
     if (node) {
       let objectNode;
-      if (node.type === "ClassProperty") {
+      if (node.type === 'ClassProperty') {
         objectNode = node.value;
-      } else if (node.type === "AssignmentExpression") {
+      } else if (node.type === 'AssignmentExpression') {
         objectNode = node.right;
       }
       if (objectNode && objectNode.type === 'ObjectExpression') {
         objectNode.properties.forEach((item) => {
-          if (item.value.type === "MemberExpression") {
+          if (item.value.type === 'MemberExpression') {
             let object = item.value.object;
             let property = item.value.property;
-            if (object.type === "Identifier" && object.name === "PropTypes" && property.type === "Identifier") {
-              if (property.name === "any") {
+            if (object.type === 'Identifier' && object.name === 'PropTypes' && property.type === 'Identifier') {
+              if (property.name === 'any') {
                 ranges.push(property.range);
               }
-            } else if (object.type === "MemberExpression") {
+            } else if (object.type === 'MemberExpression') {
               let name = object.property.name;
-              if (name === "any") {
+              if (name === 'any') {
                 ranges.push(object.property.range);
               }
             }

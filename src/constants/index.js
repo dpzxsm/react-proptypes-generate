@@ -19,13 +19,13 @@ const types = [
 ];
 
 const specialTypes = [
+  "shape",
   "exact",
   "arrayOf",
   "objectOf",
   "oneOf",
   "instanceOf",
-  "oneOfType",
-  "shape"
+  "oneOfType"
 ];
 
 exports.types = types;
