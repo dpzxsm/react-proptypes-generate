@@ -11,9 +11,8 @@ function findPropTypes({ componentNode, propTypesNode, defaultPropsNode }, optio
     findPropTypesInPropTypeNode(propTypesNode, options),
     findPropTypesInDefaultPropsNode(defaultPropsNode, options)
   ]).then((results) => {
-    let props = results.reduce((total = [], current = []) => propTypesHelper.customMergePropTypes(total, current))
+    return results.reduce((total = [], current = []) => propTypesHelper.customMergePropTypes(total, current))
       .sort(arrayUtils.sortByKey());
-    return props;
   });
 }
 
@@ -173,7 +172,7 @@ function findPropTypesInDefaultPropsNode(ast, options) {
         let value = node.value;
         if (key && value && key.type === 'Identifier') {
           let props = new PropTypes(key.name);
-          props.type = propTypesHelper.getPropTypeByNode(value);
+          propTypesHelper.updatePropTypeByNode(value, props);
           if (props.type !== 'any') {
             props.defaultValue = recast.prettyPrint(value, setting.getCodeStyle(options)).code
           }
@@ -193,21 +192,21 @@ function findPropTypesInObjectPattern(ast, options) {
     let property = properties[i].value;
     let key = properties[i].key;
     if (property && key) {
-      let propType = new PropTypes(key.name);
+      let props = new PropTypes(key.name);
       if (property.type === 'AssignmentPattern') {
         let left = properties[i].value.left;
         let right = properties[i].value.right;
         if (left && left.type === 'Identifier' && right) {
-          propType.type = propTypesHelper.getPropTypeByNode(right);
-          if (propType.type !== 'any') {
-            propType.defaultValue = recast.prettyPrint(right, setting.getCodeStyle(options)).code
+          propTypesHelper.updatePropTypeByNode(right, props);
+          if (props.type !== 'any') {
+            props.defaultValue = recast.prettyPrint(right, setting.getCodeStyle(options)).code
           }
-          propType.id = left.name;
-          propTypes.push(propType);
+          props.id = left.name;
+          propTypes.push(props);
         }
       } else if (property.type === 'Identifier') {
-        propType.id = property.name;
-        propTypes.push(propType);
+        props.id = property.name;
+        propTypes.push(props);
       }
     }
   }
@@ -216,15 +215,14 @@ function findPropTypesInObjectPattern(ast, options) {
 
 // 获取当前函数的块级作用域
 function findBlockStatement(path) {
-  while (true) {
-    if (!path.parent) {
-      return null;
-    }
-    if (path.parent.node.type === 'BlockStatement') {
-      return path.parent.node;
-    } else {
-      return findBlockStatement(path.parent)
-    }
+  if (!path) return null;
+  if (!path.parent) {
+    return null;
+  }
+  if (path.parent.node.type === 'BlockStatement') {
+    return path.parent.node;
+  } else {
+    return findBlockStatement(path.parent)
   }
 }
 
@@ -242,6 +240,7 @@ function findAndCompletePropTypes(path, propTypes) {
         if (name && propType) {
           let updatePropType = newPropTypes.find(item => item.name === name);
           if (updatePropType) {
+            updatePropType.type = 'shape';
             updatePropType.childTypes = propTypesHelper.customMergePropTypes(updatePropType.childTypes, [propType])
           }
         }

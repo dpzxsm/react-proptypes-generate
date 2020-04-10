@@ -1,6 +1,7 @@
 const PropTypes = require('../beans/PropTypes');
 const merge = require('deepmerge');
 const recast = require('recast');
+const arrayUtils = require('./arrayUtils');
 
 function isBool(value) {
   return !!value.match(/true|false/);
@@ -10,36 +11,38 @@ function isNumeric(value) {
   return !!value.match(/-?[0-9]+.?[0-9]*/);
 }
 
-function getPropTypeByNode(node) {
+function updatePropTypeByNode(node, propType) {
   if (node.type === 'CallExpression' || node.type === 'ArrowFunctionExpression') {
-    return 'func';
+    propType.type = 'func';
   } else if (node.type === 'ObjectExpression') {
-    return 'object';
+    propType.type = 'shape';
+    let properties = node.properties;
+    let childTypes = [];
+    for (let i = 0; i < properties.length; i++) {
+      let key = properties[i].key;
+      let value = properties[i].value;
+      let childType = new PropTypes(key.name);
+      // 递归补充类型
+      updatePropTypeByNode(value, childType);
+      childTypes.push(childType);
+    }
+    //不需要合并子类型
+    propType.childTypes = childTypes;
   } else if (node.type === 'ArrayExpression') {
-    return 'array';
+    propType.type = 'array';
   } else if (node.type === 'Literal') {
-    return getPropTypeByValue(node.raw);
-  } else {
-    return 'any';
+    let value = node.raw;
+    if (value.startsWith('"') && value.endsWith('"')) {
+      propType.type = 'string';
+    } else if (value.startsWith('\'') && value.endsWith('\'')) {
+      propType.type = 'string';
+    } else if (isBool(value)) {
+      propType.type = 'bool';
+    } else if (isNumeric(value)) {
+      propType.type = 'number';
+    }
   }
-}
-
-function getPropTypeByValue(value = '') {
-  let type = 'any';
-  if (value.startsWith('"') && value.endsWith('"')) {
-    type = 'string';
-  } else if (value.startsWith('\'') && value.endsWith('\'')) {
-    type = 'string';
-  } else if (value.startsWith('{') && value.endsWith('}')) {
-    type = 'object';
-  } else if (value.startsWith('[') && value.endsWith(']')) {
-    type = 'array';
-  } else if (isBool(value)) {
-    type = 'bool';
-  } else if (isNumeric(value)) {
-    type = 'number';
-  }
-  return type;
+  return propType
 }
 
 function updatePropTypeFromCode(bean, code) {
@@ -97,7 +100,9 @@ function customMergeChildTypes(target, source) {
       destination.push(item);
     }
   });
-  return destination;
+  // 合并进行排序
+  return destination.sort(arrayUtils.sortByKey('name'));
+  ;
 }
 
 // 合并两个PropType对象
@@ -107,14 +112,17 @@ function customMergePropTypes(target, source) {
   });
 
   if (result && !Array.isArray(result)) {
-    // 修改合并后的对象的原型链
-    result.__proto__ = PropTypes.prototype
+    if (Array.isArray(result)) {
+      // do nothing
+    } else {
+      // 修改合并后的对象的原型链
+      result.__proto__ = PropTypes.prototype
+    }
   }
   return result;
 }
 
-exports.getPropTypeByNode = getPropTypeByNode;
-exports.getPropTypeByValue = getPropTypeByValue;
+exports.updatePropTypeByNode = updatePropTypeByNode;
 exports.updatePropTypeFromCode = updatePropTypeFromCode;
 exports.getPropTypeByMemberExpression = getPropTypeByMemberExpression;
 exports.customMergePropTypes = customMergePropTypes;
