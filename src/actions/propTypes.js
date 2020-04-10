@@ -19,9 +19,10 @@ function findPropTypes({ componentNode, propTypesNode, defaultPropsNode }, optio
 }
 
 function findPropTypesByPropsIdentity(ast, options) {
-  let identity = 'props';
+  let identity;
   let propTypes = [];
-  if ((ast.type === 'FunctionDeclaration' || ast.type === 'ArrowFunctionExpression')
+  let visitOptions = {};
+  if ((ast.type === 'FunctionDeclaration' || ast.type === 'ArrowFunctionExpression' || ast.type === 'FunctionExpression')
     && ast.params.length > 0
   ) {
     let firstParams = ast.params[0];
@@ -31,33 +32,52 @@ function findPropTypesByPropsIdentity(ast, options) {
       let newPropTypes = findAndCompletePropTypes(ast, findPropTypesInObjectPattern(firstParams, options));
       propTypes = propTypesHelper.customMergePropTypes(propTypes, newPropTypes)
     }
+
+  } else if (ast.type === 'ClassDeclaration') {
+    identity = 'this\\.props';
+    visitOptions.visitMethodDefinition = function (path) {
+      let node = path.node;
+      if (node.key.type === 'Identifier'
+        && node.key.name === 'constructor'
+        && node.value.type === 'FunctionExpression'
+      ) {
+        let newPropTypes = findPropTypesByPropsIdentity(node.value, options);
+        propTypes = propTypesHelper.customMergePropTypes(propTypes, newPropTypes)
+      }
+      this.traverse(path);
+    };
   }
 
-  recast.visit(ast, {
-    visitMemberExpression: function (path) {
-      let { propType } = propTypesHelper.getPropTypeByMemberExpression(['this\\.props', 'props'], path);
+  if (identity) {
+    visitOptions.visitMemberExpression = function (path) {
+      let { propType } = propTypesHelper.getPropTypeByMemberExpression([identity], path);
       if (propType) {
         let newPropTypes = findAndCompletePropTypes(findBlockStatement(path), [propType]);
         propTypes = propTypesHelper.customMergePropTypes(propTypes, [propType])
       }
       this.traverse(path);
-    },
-    visitVariableDeclarator: function (path) {
-      let node = path.node;
-      let idNode = node.id;
-      let initNode = node.init;
-      if (idNode && initNode && idNode.type === 'ObjectPattern') {
-        if (
-          (initNode.type === 'MemberExpression' && initNode.property.name === identity) ||
-          (initNode.type === 'Identifier' && initNode.name === identity)
-        ) {
-          let newPropTypes = findAndCompletePropTypes(findBlockStatement(path), findPropTypesInObjectPattern(idNode));
-          propTypes = propTypesHelper.customMergePropTypes(propTypes, newPropTypes)
-        }
+    };
+  }
+
+  visitOptions.visitVariableDeclarator = function (path) {
+    let node = path.node;
+    let idNode = node.id;
+    let initNode = node.init;
+    if (idNode && initNode && idNode.type === 'ObjectPattern') {
+      if (
+        (initNode.type === 'MemberExpression'
+          && initNode.object.type === 'ThisExpression'
+          && initNode.property.name === 'props') ||
+        (initNode.type === 'Identifier' && initNode.name === identity)
+      ) {
+        let newPropTypes = findAndCompletePropTypes(findBlockStatement(path), findPropTypesInObjectPattern(idNode));
+        propTypes = propTypesHelper.customMergePropTypes(propTypes, newPropTypes)
       }
-      this.traverse(path);
     }
-  });
+    this.traverse(path);
+  };
+
+  recast.visit(ast, visitOptions);
   return propTypes;
 }
 
