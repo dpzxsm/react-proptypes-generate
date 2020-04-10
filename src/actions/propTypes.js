@@ -206,6 +206,9 @@ function findPropTypesInObjectNode(objectNode) {
 }
 
 function findPropTypesInPropTypeNode(propNode) {
+  if (!propNode) {
+    return []
+  }
   if (propNode.type === 'ClassProperty' && propNode.static) {
     return findPropTypesInObjectNode(propNode.value)
   } else if (propNode.type === 'AssignmentExpression') {
