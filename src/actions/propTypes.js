@@ -308,7 +308,7 @@ function findAndCompletePropTypes(ast, propTypes) {
         let node = path.node;
         let callee = node.callee;
         if (callee.type === 'Identifier' && ids.indexOf(callee.name) !== -1) {
-          let updatePropType = newPropTypes.find(item => item.name === callee.name);
+          let updatePropType = newPropTypes.find(item => item.id === callee.name);
           if (updatePropType) {
             updatePropType.type = 'func'
           }
@@ -318,7 +318,7 @@ function findAndCompletePropTypes(ast, propTypes) {
       visitMemberExpression: function (path) {
         let { name, propType } = propTypesHelper.getPropTypeByMemberExpression(ids, path);
         if (name && propType) {
-          let updatePropType = newPropTypes.find(item => item.name === name);
+          let updatePropType = newPropTypes.find(item => item.id === name);
           if (updatePropType) {
             // 这时候说明肯定是复杂类型，所以用shape
             updatePropType.type = 'shape';
