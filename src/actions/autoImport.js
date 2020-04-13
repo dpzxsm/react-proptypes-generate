@@ -16,10 +16,10 @@ function findImportOrRequireModuleNode(ast, options) {
       visitCallExpression: function (path) {
         let node = path.node;
         let callee = node.callee;
-        let arguments = node.arguments;
+        let params = node.arguments;
         if (callee && callee.type === 'Identifier' && callee.name === 'require'
-          && arguments && arguments[0].type === 'Literal'
-          && arguments[0].value === 'prop-types'
+          && params && params[0].type === 'Literal'
+          && params[0].value === 'prop-types'
         ) {
           result.requireNode = path.parentPath.parentPath.node;
         }
