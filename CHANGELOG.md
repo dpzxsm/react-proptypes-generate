@@ -35,4 +35,4 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ### [v1.5.0]
 - Refactor PropTypes Generate's code,  more stable search PropTypes.
-- Full Support `Shap` and `func` PropTypes Generate🎉🎉🎉.
+- Full Support `shape` and `func` PropTypes Generate🎉🎉🎉.

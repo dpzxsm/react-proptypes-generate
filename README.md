@@ -114,4 +114,4 @@ Command Line can config the following settings:
 
 ### [v1.5.0]
 - Refactor PropTypes Generate's code,  more stable search PropTypes.
-- Full Support `Shap` and `func` PropTypes Generate🎉🎉🎉.
+- Full Support `shape` and `func` PropTypes Generate🎉🎉🎉.
