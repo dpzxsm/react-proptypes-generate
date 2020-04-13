@@ -26,16 +26,6 @@ export function Test(props) {
   return <div onClick={() => onClick()}></div>
 }
 
-Test.propTypes = {
-  info: PropTypes.shape({
-    name: PropTypes.number
-  }),
-  onClick: PropTypes.func,
-  school: PropTypes.string,
-  students: PropTypes.array,
-  year: PropTypes.number
-}
-
 // const Test = () => <div title ={props.title}/>;
 
 
