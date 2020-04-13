@@ -4,9 +4,10 @@
 
 ## Installation
 ### VS Code
-  Search react-proptypes-generate in Marketplace and install it
+  Search react-proptypes-generate in Marketplace and install it.
 
 ### Command Line
+If you want to use it directly on the command line, you can install cli by npm install.
 ```
 npm install react-proptypes-generate -g
 ```
@@ -24,6 +25,40 @@ npm install react-proptypes-generate -g
 2. `rpg-cli <JsFilePath> <ComponentName>` to generate PropTypes
 3. `rpg-cli -c <JsonFilePath>` to config Command Line Settings
 
+
+## Examples case
+```jsx harmony
+import React from 'react'
+function Test(props) {
+  let { school: schoolAlias = "schoolName", info = { name: 2 }, year = 33, students = [] , onClick } = props;
+  return <div onClick={() => onClick()} />
+}
+//will generate 
+Test.propTypes = {
+  info: PropTypes.shape({
+    name: PropTypes.number
+  }),
+  onClick: PropTypes.func,
+  school: PropTypes.string,
+  students: PropTypes.array,
+  year: PropTypes.number
+} 
+```
+
+## Special case
+To prevent the `array` type may be prejudged to `shape` type, you should set a default value.
+```jsx harmony
+import React from 'react'
+function Test(props) {
+  let { students = [] } = props;
+  let length = students.length;
+  return <div/>
+}
+//will generate 
+Test.propTypes = {
+  students: PropTypes.array
+} 
+```
 
 ## Extension Settings
 
@@ -76,3 +111,7 @@ Command Line can config the following settings:
 - Changed the Component'name select way. Use cursor highlighting to select Component's name. Now you can make select Component's name' easier !!!
 - Add more Code Style to configurations.
 - Add configurations to automatically trigger vscode's formatting.
+
+### [v1.5.0]
+- Refactor PropTypes Generate's code,  more stable search PropTypes.
+- Full Support `Shap` and `func` PropTypes Generate🎉🎉🎉.

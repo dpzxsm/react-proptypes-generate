@@ -9,9 +9,13 @@ function updatePropTypeByNode(node, propType) {
     || node.type === 'ArrowFunctionExpression') {
     propType.type = 'func';
   } else if (node.type === 'ObjectExpression') {
-    propType.type = 'shape';
     let properties = node.properties;
     let childTypes = [];
+    if (properties.length > 0) {
+      propType.type = 'shape';
+    } else {
+      propType.type = 'object'
+    }
     for (let i = 0; i < properties.length; i++) {
       let key = properties[i].key;
       let value = properties[i].value;
@@ -99,7 +103,6 @@ function customMergeChildTypes(target, source) {
   });
   // 合并进行排序
   return destination.sort(arrayUtils.sortByKey('name'));
-  ;
 }
 
 // 合并两个PropType对象

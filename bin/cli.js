@@ -56,7 +56,7 @@ function run(argv) {
             actions.findPropTypesNode(ast, Object.assign({}, options, {
               alias: 'defaultProps'
             }))
-          ]).then((nodes) => {
+          ], options).then((nodes) => {
             let componentNode = nodes[0];
             let propTypesNode = nodes[1];
             let defaultPropsNode = nodes[2];

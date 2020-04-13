@@ -33,3 +33,6 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 - Add more Code Style to configurations.
 - Add configurations to automatically trigger vscode's formatting.
 
+### [v1.5.0]
+- Refactor PropTypes Generate's code,  more stable search PropTypes.
+- Full Support `Shap` and `func` PropTypes Generate🎉🎉🎉.

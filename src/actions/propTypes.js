@@ -319,7 +319,10 @@ function findBlockStatement(path) {
 
 function findAndCompletePropTypes(ast, propTypes) {
   let newPropTypes = propTypes.slice();
-  let ids = newPropTypes.filter(item => !!item.id).map(item => item.id);
+  let ids = newPropTypes
+    .filter(item => !!item.id) // Must have id
+    .filter(item => item.type === 'any' || item.type === 'shape') // Others not need complete
+    .map(item => item.id);
   // 优化性能，减少查找次数
   if (ids.length === 0) return;
   if (ast) {
@@ -340,9 +343,9 @@ function findAndCompletePropTypes(ast, propTypes) {
         if (name && propType) {
           let updatePropType = newPropTypes.find(item => item.id === name);
           if (updatePropType) {
+            let newPropTypes = findAndCompletePropTypes(ast, [propType]);
             // 这时候说明肯定是复杂类型，所以用shape
             updatePropType.type = 'shape';
-            let newPropTypes = findAndCompletePropTypes(ast, [propType]);
             updatePropType.childTypes = propTypesHelper.customMergePropTypes(updatePropType.childTypes, newPropTypes)
           }
         }

@@ -1,43 +1,42 @@
 import PropTypes from 'prop-types';
-export default class Test extends PureComponent {
-  // constructor(props) {
-  //   super(props);
-  //   this.state = {
-  //     title: props.title,
-  //     age: props.age
-  //   };
-  // }
+// export default class Test extends PureComponent {
 
-  render() {
-    let { school: schoolAlias = "schoolName", info = { name: 2 } } = this.props;
-    let info = this.props.info;
-    let heihei = this.props.info.heihei;
-    let age = info.age;
-    let name = info.name;
-    return <div>
-    </div>
-  }
+//   constructor(props) {
+//     super(props);
+//     this.state = {
+//       title: props.title,
+//       age: props.age
+//     };
+//   }
+
+//   render() {
+//     let { school: schoolAlias = "schoolName", info = { name: 2 }, jk = 33, students = [] } = this.props;
+//     let info = this.props.info;
+//     // let legnth = this.props.info.legnth;
+//     // let age = info.age;
+//     // let name = info.name;
+//     return <div>
+//     </div>
+//   }
+// }
+
+export function Test(props) {
+  let { school: schoolAlias = 'schoolName', info = { name: 2 }, year = 33, students = [], onClick } = props;
+  let length = students.length;
+  return <div onClick={() => onClick()}></div>
 }
 
-
-// const PropTypes = require("prop-types");
-// export function Test(props) {
-//   let name = props.people.name;
-//   return (
-//     <div className="player">
-//     </div>
-//   );
-// }
-
+Test.propTypes = {
+  info: PropTypes.shape({
+    name: PropTypes.number
+  }),
+  onClick: PropTypes.func,
+  school: PropTypes.string,
+  students: PropTypes.array,
+  year: PropTypes.number
+}
 
 // const Test = () => <div title ={props.title}/>;
-
-
-// Test.propTypes = {
-//   clip: PropTypes.number,
-//   dd: PropTypes.any
-// }
-
 
 
 
