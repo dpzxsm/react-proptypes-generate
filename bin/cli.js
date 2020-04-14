@@ -90,7 +90,7 @@ function run(argv) {
                   }
                 } else {
                   insertPosition = componentNode.range[1];
-                  return insertCode(filePath, insertPosition, "\n\n" + code + "\n");
+                  return insertCode(filePath, insertPosition, "\n\n" + code);
                 }
               }
             });

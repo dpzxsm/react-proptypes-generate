@@ -66,6 +66,7 @@ function getPropTypeByMemberExpression(ids, path) {
   let code = recast.print(path.node).code;
   let regex = new RegExp(`(${ids.join('|')})((\\.[a-zA-Z_$][a-zA-Z0-9_$]*)+)`);
   let match = regex.exec(code);
+  let firstPropType;
   let lastPropType;
   if (match) {
     let properties = match[2].replace('.', '').split('.');
@@ -75,14 +76,20 @@ function getPropTypeByMemberExpression(ids, path) {
         propType.type = 'shape';
         propType.childTypes = [lastPropType]
       }
+      if (i === properties.length - 1) {
+        firstPropType = propType
+      }
       lastPropType = propType
     }
+    let parentNode = path.parent.node;
+    if (firstPropType) {
+      if (parentNode.type === 'BinaryExpression' || parentNode.type === 'LogicalExpression') {
+        updatePropTypeByNode(parentNode.right, firstPropType)
+      }
+    }
     if (lastPropType) {
-      let parentNode = path.parent.node;
       if (parentNode.type === 'VariableDeclarator') {
         lastPropType.id = path.parent.node.id.name
-      } else if (parentNode.type === 'BinaryExpression' || parentNode.type === 'LogicalExpression') {
-        updatePropTypeByNode(parentNode.right, lastPropType)
       }
     }
     return {
