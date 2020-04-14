@@ -326,7 +326,19 @@ function findAndCompletePropTypes(ast, propTypes) {
   // 优化性能，减少查找次数
   if (ids.length === 0) return newPropTypes;
   if (ast) {
+    let visitLogicalExpression = function (path) {
+      let node = path.node;
+      let left = node.left;
+      let right = node.right;
+      if (left.type === 'Identifier' && ids.indexOf(left.name) !== -1) {
+        let updatePropType = newPropTypes.find(item => item.id === left.name);
+        updatePropType && propTypesHelper.updatePropTypeByNode(right, updatePropType)
+      }
+      this.traverse(path);
+    };
     recast.visit(ast, {
+      visitBinaryExpression: visitLogicalExpression,
+      visitLogicalExpression: visitLogicalExpression,
       visitCallExpression: function (path) {
         let node = path.node;
         let callee = node.callee;
