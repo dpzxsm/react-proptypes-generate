@@ -324,7 +324,7 @@ function findAndCompletePropTypes(ast, propTypes) {
     .filter(item => item.type === 'any' || item.type === 'shape') // Others not need complete
     .map(item => item.id);
   // 优化性能，减少查找次数
-  if (ids.length === 0) return;
+  if (ids.length === 0) return newPropTypes;
   if (ast) {
     recast.visit(ast, {
       visitCallExpression: function (path) {
@@ -350,7 +350,7 @@ function findAndCompletePropTypes(ast, propTypes) {
           }
         }
         this.traverse(path);
-      },
+      }
     });
   }
   return newPropTypes;

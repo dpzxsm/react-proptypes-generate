@@ -77,8 +77,13 @@ function getPropTypeByMemberExpression(ids, path) {
       }
       lastPropType = propType
     }
-    if (lastPropType && path.parent.node.type === 'VariableDeclarator') {
-      lastPropType.id = path.parent.node.id.name
+    if (lastPropType) {
+      let parentNode = path.parent.node;
+      if (parentNode.type === 'VariableDeclarator') {
+        lastPropType.id = path.parent.node.id.name
+      } else if (parentNode.type === 'BinaryExpression' || parentNode.type === 'LogicalExpression') {
+        updatePropTypeByNode(parentNode.right, lastPropType)
+      }
     }
     return {
       name: match[1],
