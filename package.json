@@ -2,7 +2,7 @@
     "name": "react-proptypes-generate",
     "displayName": "React PropTypes Generate",
     "description": "Auto generate react's propTypes",
-    "version": "1.5.2",
+    "version": "1.5.3",
     "publisher": "suming",
     "author": "suming",
     "license": "MIT",
@@ -21,7 +21,7 @@
     "activationEvents": [
         "*"
     ],
-    "main": "./extension",
+    "main": "./dist/extension",
     "bin": {
         "rpg-cli": "./bin/cli.js"
     },
@@ -87,6 +87,11 @@
                     "type": "boolean",
                     "default": false,
                     "description": "After generate propTypes, trigger vscode's formatting for PropTypes"
+                },
+                "propTypes.noMergeOld": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Defaults is merge old PropTypes, if true, will not merge old PropTypes"
                 }
             }
         }

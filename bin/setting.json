@@ -1,6 +1,7 @@
 {
   "autoImport": "ES6",
   "codeStyle": "default",
+  "noMergeOld": false,
   "tabWidth": 2,
   "quote": null,
   "trailingComma": false

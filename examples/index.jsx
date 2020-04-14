@@ -21,10 +21,10 @@ import PropTypes from 'prop-types';
 // }
 
 export function Test(props) {
-  let { school: schoolAlias = 'schoolName', info = { name: 2 }, year = 33, students = [], onClick } = props;
-  let length = students.length;
+  let bbb = props.bbb.aaa
   return <div onClick={() => onClick()}></div>
 }
+
 
 // const Test = () => <div title ={props.title}/>;
 

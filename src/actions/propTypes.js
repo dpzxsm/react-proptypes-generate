@@ -6,11 +6,15 @@ const propTypesHelper = require('../utils/propTypesHelper');
 const setting = require('../setting');
 
 function findPropTypes({ componentNode, propTypesNode, defaultPropsNode }, options) {
-  return Promise.all([
+  let actions = [
     findPropTypesByPropsIdentity(componentNode, options), //代码生成类型
     findPropTypesInDefaultPropsNode(defaultPropsNode, options), //默认类型
-    findPropTypesInPropTypeNode(propTypesNode), //优先级最高，必须确保已经填写的PropTypes级别最高
-  ]).then((results) => {
+  ];
+  if (options.noMergeOld) {
+    //优先级最高，必须确保已经填写的PropTypes级别最高
+    actions.push(findPropTypesInPropTypeNode(propTypesNode))
+  }
+  return Promise.all(actions).then((results) => {
     return results.reduce((total = [], current = []) => {
       return propTypesHelper.customMergePropTypes(total, current)
     }, [])
@@ -330,7 +334,7 @@ function findAndCompletePropTypes(ast, propTypes) {
       let node = path.node;
       let left = node.left;
       let right = node.right;
-      if (left.type === 'Identifier' && ids.indexOf(left.name) !== -1) {
+      if (left && right && left.type === 'Identifier' && ids.indexOf(left.name) !== -1) {
         let updatePropType = newPropTypes.find(item => item.id === left.name);
         updatePropType && propTypesHelper.updatePropTypeByNode(right, updatePropType)
       }
@@ -339,6 +343,15 @@ function findAndCompletePropTypes(ast, propTypes) {
     recast.visit(ast, {
       visitBinaryExpression: visitLogicalExpression,
       visitLogicalExpression: visitLogicalExpression,
+      visitUpdateExpression: function (path) {
+        let node = path.node;
+        let argument = node.argument;
+        if (argument && argument.type === 'Identifier' && ids.indexOf(argument.name) !== -1) {
+          let updatePropType = newPropTypes.find(item => item.id === argument.name);
+          updatePropType && (updatePropType.type = 'number')
+        }
+        this.traverse(path);
+      },
       visitCallExpression: function (path) {
         let node = path.node;
         let callee = node.callee;

@@ -64,7 +64,7 @@ function updatePropTypeFromCode(bean, code) {
 
 function getPropTypeByMemberExpression(ids, path) {
   let code = recast.print(path.node).code;
-  let regex = new RegExp(`(${ids.join('|')})((\\.[a-zA-Z_$][a-zA-Z0-9_$]*)+)`);
+  let regex = new RegExp(`^(${ids.join('|')})((\\.[a-zA-Z_$][a-zA-Z0-9_$]*)+)$`);
   let match = regex.exec(code);
   let firstPropType;
   let lastPropType;
@@ -83,8 +83,18 @@ function getPropTypeByMemberExpression(ids, path) {
     }
     let parentNode = path.parent.node;
     if (firstPropType) {
-      if (parentNode.type === 'BinaryExpression' || parentNode.type === 'LogicalExpression') {
+      if (parentNode.type === 'BinaryExpression') {
+        if (parentNode.operator === '*') {
+          firstPropType.type = 'number'
+        } else {
+          updatePropTypeByNode(parentNode.right, firstPropType)
+        }
+      } else if (parentNode.type === 'LogicalExpression') {
         updatePropTypeByNode(parentNode.right, firstPropType)
+      } else if (parentNode.type === 'UpdateExpression') {
+        firstPropType.type = 'number';
+      } else if (parentNode.type === 'CallExpression') {
+        firstPropType.type = 'func'
       }
     }
     if (lastPropType) {
