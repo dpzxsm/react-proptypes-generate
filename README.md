@@ -120,7 +120,7 @@ Command Line can config the following settings:
 
 ### [v1.5.0]
 - Refactor PropTypes Generate's code,  more stable search PropTypes.
-- Full Support `shape` and `func` PropTypes Generate🎉🎉🎉.
+- Full Support `shape` and `func` automatically PropTypes Generate🎉🎉🎉.
 
 ### [v1.5.2]
 - Fix `shape` type Generated bug !!!
