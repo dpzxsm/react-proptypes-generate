@@ -382,7 +382,7 @@ function getPropTypeByMemberExpression(path, ids) {
         propTypesHelper.updatePropTypeByNode(parentNode.right, firstPropType)
       } else if (parentNode.type === 'UpdateExpression') {
         firstPropType.type = 'number';
-      } else if (parentNode.type === 'CallExpression') {
+      } else if (parentNode.type === 'CallExpression' && recast.print(parentNode).code === code) {
         firstPropType.type = 'func'
       }
     }
