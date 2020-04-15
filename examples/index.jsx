@@ -21,8 +21,15 @@ import PropTypes from 'prop-types';
 // }
 
 export function Test(props) {
-  let bbb = props.bbb.aaa
-  return <div onClick={() => onClick()}></div>
+  let { school: schoolAlias = "schoolName", info = { name: "test" }, age = 33, students = [] } = props;
+  if(info.year === 2020){
+    console.log("will generate year type as number");
+  }
+  // support deep find
+  let childInfo = info.child.info;
+  return <div onClick={() => props.onClick()}>
+    {students.map((student, index) =><div key={index}/>)}
+  </div>
 }
 
 
