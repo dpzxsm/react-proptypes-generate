@@ -90,7 +90,7 @@ function findPropTypesByPropsIdentity(ast, options) {
 function fixAllShapePropType(propTypes, options) {
   return propTypes.map(item => {
     if (item.type === 'shape') {
-      if (item.childTypes.every(child => {
+      if (options.arrayLike && item.childTypes.every(child => {
         let isArrayLength = child.name === 'length' && child.type === 'number';
         let isArrayFunc = child.type === 'func' && constants.arrayFunctions.indexOf(child.name) !== -1;
         return isArrayLength || isArrayFunc
