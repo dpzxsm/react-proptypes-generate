@@ -28,5 +28,41 @@ const specialTypes = [
   'oneOfType'//数组
 ];
 
+const arrayFunctions = [
+  "concat",
+  "copyWithin",
+  "entries",
+  "every",
+  "fill",
+  "filter",
+  "find",
+  "findIndex",
+  "flat",
+  "flatMap",
+  "forEach",
+  "includes",
+  "indexOf",
+  "join",
+  "keys",
+  "lastIndexOf",
+  "map",
+  "pop",
+  "push",
+  "reduce",
+  "reduceRight",
+  "reverse",
+  "shift",
+  "slice",
+  "some",
+  "sort",
+  "splice",
+  "toLocaleString",
+  "toSource",
+  "toString",
+  "unshift",
+  "values",
+];
+
 exports.types = types;
 exports.specialTypes = specialTypes;
+exports.arrayFunctions = arrayFunctions;

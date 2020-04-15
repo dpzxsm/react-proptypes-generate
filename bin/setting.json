@@ -2,6 +2,7 @@
   "autoImport": "ES6",
   "codeStyle": "default",
   "noMergeOld": false,
+  "noShape": false,
   "tabWidth": 2,
   "quote": null,
   "trailingComma": false

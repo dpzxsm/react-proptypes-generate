@@ -4,6 +4,7 @@ const arrayUtils = require('../utils/arrayUtils');
 const PropTypes = require('../beans/PropTypes');
 const propTypesHelper = require('../utils/propTypesHelper');
 const setting = require('../setting');
+const constants = require('../constants');
 
 function findPropTypes({ componentNode, propTypesNode, defaultPropsNode }, options) {
   let actions = [
@@ -53,10 +54,10 @@ function findPropTypesByPropsIdentity(ast, options) {
   }
 
   if (identity) {
+    // 可能是 props or this.props
     visitOptions.visitMemberExpression = function (path) {
-      let { propType } = propTypesHelper.getPropTypeByMemberExpression([identity], path);
+      let { propType } = getPropTypeByMemberExpression(path, [identity]);
       if (propType) {
-        let newPropTypes = findAndCompletePropTypes(findBlockStatement(path), [propType]);
         propTypes = propTypesHelper.customMergePropTypes(propTypes, [propType])
       }
       this.traverse(path);
@@ -82,7 +83,31 @@ function findPropTypesByPropsIdentity(ast, options) {
   };
 
   recast.visit(ast, visitOptions);
-  return propTypes;
+  return fixAllShapePropType(propTypes, options);
+}
+
+// 统一修正类型
+function fixAllShapePropType(propTypes, options) {
+  return propTypes.map(item => {
+    if (item.type === 'shape') {
+      if (item.childTypes.every(child => {
+        let isArrayLength = child.name === 'length' && child.type === 'number';
+        let isArrayFunc = child.type === 'func' && constants.arrayFunctions.indexOf(child.name) !== -1;
+        return isArrayLength || isArrayFunc
+      })) {
+        // 如果shape的所有类型和array极其相似，那就默认为array类型
+        return new PropTypes(item.name, 'array', item.isRequired);
+      }
+      if (options.noShape) {
+        // 如果setting不允许生成shape类型，那就默认为object类型
+        return new PropTypes(item.name, 'object', item.isRequired);
+      }
+      item.childTypes = fixAllShapePropType(item.childTypes, options);
+      return item;
+    } else {
+      return item;
+    }
+  })
 }
 
 function findComponentNode(ast, options) {
@@ -321,6 +346,56 @@ function findBlockStatement(path) {
   }
 }
 
+function getPropTypeByMemberExpression(path, ids) {
+  let code = recast.print(path.node).code;
+  let regex = new RegExp(`^(${ids.join('|')})((\\.[a-zA-Z_$][a-zA-Z0-9_$]*)+)$`);
+  let match = regex.exec(code);
+  let firstPropType;
+  let lastPropType;
+  if (match) {
+    let parentNode = path.parent.node;
+    let properties = match[2].replace('.', '').split('.');
+    for (let i = properties.length - 1; i >= 0; i--) {
+      let propType = new PropTypes(properties[i]);
+      if (lastPropType) {
+        propType.type = 'shape';
+        propType.childTypes = [lastPropType]
+      }
+      if (i === properties.length - 1) {
+        // 如果第一个PropTypes 是一个变量声明表达式的话 TODO 暂时不考虑析构函数，不然又是一个递归
+        if (parentNode.type === 'VariableDeclarator' && parentNode.id.type === 'Identifier') {
+          propType.id = parentNode.id.name;
+          propType = findAndCompletePropTypes(findBlockStatement(path), [propType])[0]
+        }
+        firstPropType = propType
+      }
+      lastPropType = propType
+    }
+    if (firstPropType) {
+      if (parentNode.type === 'BinaryExpression') {
+        if (parentNode.operator === '*') {
+          firstPropType.type = 'number'
+        } else {
+          propTypesHelper.updatePropTypeByNode(parentNode.right, firstPropType)
+        }
+      } else if (parentNode.type === 'LogicalExpression') {
+        propTypesHelper.updatePropTypeByNode(parentNode.right, firstPropType)
+      } else if (parentNode.type === 'UpdateExpression') {
+        firstPropType.type = 'number';
+      } else if (parentNode.type === 'CallExpression') {
+        firstPropType.type = 'func'
+      }
+    }
+    return {
+      name: match[1],
+      propType: lastPropType
+    };
+  } else {
+    return {};
+  }
+}
+
+
 function findAndCompletePropTypes(ast, propTypes) {
   let newPropTypes = propTypes.slice();
   let ids = newPropTypes
@@ -364,14 +439,13 @@ function findAndCompletePropTypes(ast, propTypes) {
         this.traverse(path);
       },
       visitMemberExpression: function (path) {
-        let { name, propType } = propTypesHelper.getPropTypeByMemberExpression(ids, path);
+        let { name, propType } = getPropTypeByMemberExpression(path, ids);
         if (name && propType) {
           let updatePropType = newPropTypes.find(item => item.id === name);
           if (updatePropType) {
-            let newPropTypes = findAndCompletePropTypes(ast, [propType]);
             // 这时候说明肯定是复杂类型，所以用shape
             updatePropType.type = 'shape';
-            updatePropType.childTypes = propTypesHelper.customMergePropTypes(updatePropType.childTypes, newPropTypes)
+            updatePropType.childTypes = propTypesHelper.customMergePropTypes(updatePropType.childTypes, [propType])
           }
         }
         this.traverse(path);
@@ -384,4 +458,5 @@ function findAndCompletePropTypes(ast, propTypes) {
 exports.findPropTypes = findPropTypes;
 exports.findComponentNode = findComponentNode;
 exports.findPropTypesNode = findPropTypesNode;
+exports.findAndCompletePropTypes = findAndCompletePropTypes;
 exports.findPropTypesInPropTypeNode = findPropTypesInPropTypeNode;

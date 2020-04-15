@@ -86,12 +86,17 @@
                 "propTypes.afterFormat": {
                     "type": "boolean",
                     "default": false,
-                    "description": "After generate propTypes, trigger vscode's formatting for PropTypes"
+                    "description": "if true, after generate propTypes, trigger vscode's formatting for PropTypes"
                 },
                 "propTypes.noMergeOld": {
                     "type": "boolean",
                     "default": false,
                     "description": "Defaults is merge old PropTypes, if true, will not merge old PropTypes"
+                },
+                "propTypes.noShape": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Defaults is generate shape type, if true, will generate object type"
                 }
             }
         }
@@ -99,7 +104,7 @@
     "scripts": {
         "postinstall": "node ./node_modules/vscode/bin/install",
         "compile": "node ./node_modules/vscode/bin/compile",
-        "start": "code --extensionDevelopmentPath=/Users/user/sumingProjects/react-proptypes",
+        "start": "npm run webpack && code --extensionDevelopmentPath=/Users/user/sumingProjects/react-proptypes",
         "vscode:prepublish": "webpack --mode production",
         "webpack": "webpack --mode development",
         "webpack-dev": "webpack --mode development --watch",

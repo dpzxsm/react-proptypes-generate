@@ -62,55 +62,6 @@ function updatePropTypeFromCode(bean, code) {
   return bean;
 }
 
-function getPropTypeByMemberExpression(ids, path) {
-  let code = recast.print(path.node).code;
-  let regex = new RegExp(`^(${ids.join('|')})((\\.[a-zA-Z_$][a-zA-Z0-9_$]*)+)$`);
-  let match = regex.exec(code);
-  let firstPropType;
-  let lastPropType;
-  if (match) {
-    let properties = match[2].replace('.', '').split('.');
-    for (let i = properties.length - 1; i >= 0; i--) {
-      let propType = new PropTypes(properties[i]);
-      if (lastPropType) {
-        propType.type = 'shape';
-        propType.childTypes = [lastPropType]
-      }
-      if (i === properties.length - 1) {
-        firstPropType = propType
-      }
-      lastPropType = propType
-    }
-    let parentNode = path.parent.node;
-    if (firstPropType) {
-      if (parentNode.type === 'BinaryExpression') {
-        if (parentNode.operator === '*') {
-          firstPropType.type = 'number'
-        } else {
-          updatePropTypeByNode(parentNode.right, firstPropType)
-        }
-      } else if (parentNode.type === 'LogicalExpression') {
-        updatePropTypeByNode(parentNode.right, firstPropType)
-      } else if (parentNode.type === 'UpdateExpression') {
-        firstPropType.type = 'number';
-      } else if (parentNode.type === 'CallExpression') {
-        firstPropType.type = 'func'
-      }
-    }
-    if (lastPropType) {
-      if (parentNode.type === 'VariableDeclarator') {
-        lastPropType.id = path.parent.node.id.name
-      }
-    }
-    return {
-      name: match[1],
-      propType: lastPropType
-    };
-  } else {
-    return {};
-  }
-}
-
 // 自定义合并数组
 function customMergeChildTypes(target, source) {
   const destination = target.slice();
@@ -145,6 +96,4 @@ function customMergePropTypes(target, source) {
 }
 
 exports.updatePropTypeByNode = updatePropTypeByNode;
-exports.updatePropTypeFromCode = updatePropTypeFromCode;
-exports.getPropTypeByMemberExpression = getPropTypeByMemberExpression;
 exports.customMergePropTypes = customMergePropTypes;
