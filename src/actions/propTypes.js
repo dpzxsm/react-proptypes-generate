@@ -11,7 +11,7 @@ function findPropTypes({ componentNode, propTypesNode, defaultPropsNode }, optio
     findPropTypesByPropsIdentity(componentNode, options), //代码生成类型
     findPropTypesInDefaultPropsNode(defaultPropsNode, options), //默认类型
   ];
-  if (options.noMergeOld) {
+  if (!options.noMergeOld) {
     //优先级最高，必须确保已经填写的PropTypes级别最高
     actions.push(findPropTypesInPropTypeNode(propTypesNode))
   }
@@ -348,13 +348,13 @@ function findBlockStatement(path) {
 
 function getPropTypeByMemberExpression(path, ids) {
   let code = recast.print(path.node).code;
-  let regex = new RegExp(`^(${ids.join('|')})((\\.[a-zA-Z_$][a-zA-Z0-9_$]*)+)$`);
+  let regex = new RegExp(`^(${ids.join('|')})((\\??\\.[a-zA-Z_$][a-zA-Z0-9_$]*)+)$`);
   let match = regex.exec(code);
   let firstPropType;
   let lastPropType;
   if (match) {
     let parentNode = path.parent.node;
-    let properties = match[2].replace('.', '').split('.');
+    let properties = match[2].replace(/^\??\./, '').split(/\??\./);
     for (let i = properties.length - 1; i >= 0; i--) {
       let propType = new PropTypes(properties[i]);
       if (lastPropType) {
@@ -382,7 +382,7 @@ function getPropTypeByMemberExpression(path, ids) {
         propTypesHelper.updatePropTypeByNode(parentNode.right, firstPropType)
       } else if (parentNode.type === 'UpdateExpression') {
         firstPropType.type = 'number';
-      } else if (parentNode.type === 'CallExpression' && recast.print(parentNode.callee).code === code) {
+      } else if (parentNode.type.indexOf('CallExpression')!==-1 && recast.print(parentNode.callee).code === code) {
         firstPropType.type = 'func'
       }
     }
@@ -415,9 +415,34 @@ function findAndCompletePropTypes(ast, propTypes) {
       }
       this.traverse(path);
     };
+    let visitMemberExpression = function (path) {
+      let { name, propType } = getPropTypeByMemberExpression(path, ids);
+      if (name && propType) {
+        let updatePropType = newPropTypes.find(item => item.id === name);
+        if (updatePropType) {
+          // 这时候说明肯定是复杂类型，所以用shape
+          updatePropType.type = 'shape';
+          updatePropType.childTypes = propTypesHelper.customMergePropTypes(updatePropType.childTypes, [propType])
+        }
+      }
+      this.traverse(path);
+    }
+    let visitCallExpression = function (path) {
+      let node = path.node;
+      let callee = node.callee;
+      if (callee.type === 'Identifier' && ids.indexOf(callee.name) !== -1) {
+        let updatePropType = newPropTypes.find(item => item.id === callee.name);
+        if (updatePropType) {
+          updatePropType.type = 'func'
+        }
+      }
+      this.traverse(path);
+    }
     recast.visit(ast, {
       visitBinaryExpression: visitLogicalExpression,
       visitLogicalExpression: visitLogicalExpression,
+      visitOptionalMemberExpression: visitMemberExpression,
+      visitMemberExpression: visitMemberExpression,
       visitUpdateExpression: function (path) {
         let node = path.node;
         let argument = node.argument;
@@ -427,29 +452,8 @@ function findAndCompletePropTypes(ast, propTypes) {
         }
         this.traverse(path);
       },
-      visitCallExpression: function (path) {
-        let node = path.node;
-        let callee = node.callee;
-        if (callee.type === 'Identifier' && ids.indexOf(callee.name) !== -1) {
-          let updatePropType = newPropTypes.find(item => item.id === callee.name);
-          if (updatePropType) {
-            updatePropType.type = 'func'
-          }
-        }
-        this.traverse(path);
-      },
-      visitMemberExpression: function (path) {
-        let { name, propType } = getPropTypeByMemberExpression(path, ids);
-        if (name && propType) {
-          let updatePropType = newPropTypes.find(item => item.id === name);
-          if (updatePropType) {
-            // 这时候说明肯定是复杂类型，所以用shape
-            updatePropType.type = 'shape';
-            updatePropType.childTypes = propTypesHelper.customMergePropTypes(updatePropType.childTypes, [propType])
-          }
-        }
-        this.traverse(path);
-      }
+      visitCallExpression: visitCallExpression,
+      visitOptionalCallExpressionL: visitCallExpression
     });
   }
   return newPropTypes;

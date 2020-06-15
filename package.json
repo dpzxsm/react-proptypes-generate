@@ -121,7 +121,6 @@
         "eslint": "^4.11.0",
         "ts-loader": "^6.2.2",
         "typescript": "^2.6.1",
-        "vscode": "^1.1.36",
         "webpack": "^4.42.1",
         "webpack-cli": "^3.3.11"
     },
@@ -129,7 +128,8 @@
         "bluebird": "^3.5.3",
         "deepmerge": "^4.2.2",
         "flow-parser": "^0.86.0",
-        "recast": "^0.16.0"
+        "recast": "^0.16.0",
+        "vscode": "^1.1.36"
     },
     "keywords": [
         "react",
