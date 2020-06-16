@@ -107,7 +107,7 @@
         }
     },
     "scripts": {
-        "postinstall": "node ./node_modules/vscode/bin/install",
+        "postinstall": "node ./postinstall",
         "compile": "node ./node_modules/vscode/bin/compile",
         "start": "npm run webpack && code --extensionDevelopmentPath=/Users/user/sumingProjects/react-proptypes",
         "vscode:prepublish": "webpack --mode production",
@@ -121,6 +121,7 @@
         "eslint": "^4.11.0",
         "ts-loader": "^6.2.2",
         "typescript": "^2.6.1",
+        "vscode": "^1.1.36",
         "webpack": "^4.42.1",
         "webpack-cli": "^3.3.11"
     },
@@ -129,8 +130,7 @@
         "commander": "^5.1.0",
         "deepmerge": "^4.2.2",
         "flow-parser": "^0.86.0",
-        "recast": "^0.16.0",
-        "vscode": "^1.1.36"
+        "recast": "^0.16.0"
     },
     "keywords": [
         "react",
