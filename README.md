@@ -105,10 +105,6 @@ Command Line can config the following settings:
 ### [v1.3]
 - Support Pure ArrowFunction Component
 
-### [v1.3.1]
-- Auto Import is defaults to ES6
-- Update the vscode dependencies
-
 ### [v1.3.2]
 - Auto Import is defaults to ES6
 - Update the vscode dependencies
@@ -131,3 +127,7 @@ Command Line can config the following settings:
 - Support config disable `shape` type generated, instead of `object` type.
 - Support config not merge old PropTypes.
 - Support config automatically generated `array` type instead of `shape` type that similar to Array Type
+
+### [v1.5.6]
+- Fix `noMergeOld` settings that get inverse value
+- Support `Null Propagation`
