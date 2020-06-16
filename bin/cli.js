@@ -3,125 +3,119 @@
 const path = require("path");
 const fs = require("fs");
 const Promise = require("bluebird");
+const { program } = require('commander')
 const astHelper = require("../src/astHelper");
 const actions = require("../src/actions");
 const codeBuilder = require("../src/utils/codeBuilder");
 const manifest = require("../package.json");
 
-function run(argv) {
-  if (argv[0] === '-v' || argv[0] === '--version') {
-    console.log("v" + manifest.version);
-  } else if (argv[0] === '-h' || argv[0] === '--help') {
-    console.log("\n   Usage: rpg-cli [filePath] [componentName]\n\n" +
-      "   Options:\n" +
-      "     -h, --help      output usage information\n" +
-      "     -v, --version   output the version number\n" +
-      "     -c, --config    config the Code Style, more info you can look at https://github.com/dpzxsm/react-proptypes-generate\n");
-  } else if ((argv[0] === '-c' || argv[0] === '--config')) {
-    if (argv[1]) {
-      let configPath = path.normalize(argv[1]);
-      try {
-        let json = fs.readFileSync(configPath, "utf-8");
-        let config = JSON.parse(json);
-        if (config && saveConfig(JSON.stringify(config, null, 2))) {
-          console.log("Write Config Success");
-        } else {
-          console.log("JSON parse Fail !");
-        }
-      } catch (e) {
-        console.error(e);
-      }
-    } else {
-      console.error('Please input a json file path');
-    }
-  } else {
-    if (argv[0] && argv[1]) {
-      try {
-        let filePath = path.normalize(argv[0]);
-        let name = argv[1];
-        fs.readFile(filePath, "utf-8", function (err, data) {
-          if (!data) {
-            console.error('can\'t resolve filePath: ' + filePath);
-            return;
-          }
-          let ast = astHelper.flowAst(data);
-          let options = {
-            name,
-          };
-          // merge config to options
-          Object.assign(options, readConfig());
-          Promise.all([
-            actions.findComponentNode(ast, options),
-            actions.findPropTypesNode(ast, options),
-            actions.findPropTypesNode(ast, Object.assign({}, options, {
-              alias: 'defaultProps'
-            }))
-          ], options).then((nodes) => {
-            let componentNode = nodes[0];
-            let propTypesNode = nodes[1];
-            let defaultPropsNode = nodes[2];
-            return actions.findPropTypes({
-              componentNode,
-              propTypesNode,
-              defaultPropsNode
-            }, options).then((propTypes) => {
-              if (propTypes.length === 0) {
-                throw new Error("Not find any props");
-              }
-              if (propTypesNode) {
-                if (propTypesNode.type === 'AssignmentExpression') {
-                  // override old code style
-                  options.codeStyle = 'default';
-                } else if (propTypesNode.type === 'ClassProperty') {
-                  options.codeStyle = 'class';
-                }
-              } else if (componentNode.type === 'FunctionDeclaration' || componentNode.type === 'ArrowFunctionExpression') {
-                options.codeStyle = 'default';
-              }
-              let code = codeBuilder.buildPropTypes(propTypes, options);
-              if (propTypesNode) {
-                return replaceCode(filePath, propTypesNode.range, code);
-              } else {
-                let insertPosition;
-                if (options.codeStyle === 'class') {
-                  if (componentNode.body) {
-                    insertPosition = componentNode.body.range[0] + 1;
-                    return insertCode(filePath, insertPosition, "\n  " + code + "\n");
-                  }
-                } else {
-                  insertPosition = componentNode.range[1];
-                  return insertCode(filePath, insertPosition, "\n\n" + code);
-                }
-              }
-            });
-          }).then(result => {
-            if (options.autoImport !== 'disable') {
-              let { importNode, requireNode } = actions.findImportOrRequireModuleNode(ast, options);
-              let firstBody = ast.body[0];
-              let importCode = codeBuilder.buildImportCode(options);
-              if (!importNode && !requireNode && firstBody && importCode) {
-                let insertPosition = firstBody.range[0];
-                return insertCode(filePath, insertPosition, importCode + "\n");
-              }
-            }
-            return result;
-          }).then((result) => {
-            if (result) {
-              console.log('Generated Success!');
-            }
-          }).catch(error => {
-            console.error(error);
-          });
-        });
-      } catch (e) {
-        console.error(e);
-      }
-    } else {
-      console.log("Please input a file path and component's Name");
-    }
-
-  }
+const styles = {
+  'black': '\x1B[30m%s\x1B[39m', 'blue': '\x1B[34m%s\x1B[39m', 'green': '\x1B[32m%s\x1B[39m',
+  'red': '\x1B[31m%s\x1B[39m', 'yellow': '\x1B[33m%s\x1B[39m'
 }
+
+program.version(manifest.version)
+  .arguments('<filePath> <componentName>')
+  .action(function(filePath, componentName){
+    try {
+      let normalizePath = path.normalize(filePath);
+      fs.readFile(normalizePath, "utf-8", function (err, data) {
+        if (!data) {
+          console.error('can\'t resolve filePath: ' + normalizePath);
+          return;
+        }
+        let ast = astHelper.flowAst(data);
+        let params = {
+          name: componentName
+        };
+        // merge config to options
+        let options = Object.assign({}, readConfig(), params);
+        Promise.all([
+          actions.findComponentNode(ast, options),
+          actions.findPropTypesNode(ast, options),
+          actions.findPropTypesNode(ast, Object.assign({}, options, {
+            alias: 'defaultProps'
+          }))
+        ], options).then((nodes) => {
+          let componentNode = nodes[0];
+          let propTypesNode = nodes[1];
+          let defaultPropsNode = nodes[2];
+          return actions.findPropTypes({
+            componentNode,
+            propTypesNode,
+            defaultPropsNode
+          }, options).then((propTypes) => {
+            if (propTypes.length === 0) {
+              throw new Error("Not find any props");
+            }
+            if (propTypesNode) {
+              if (propTypesNode.type === 'AssignmentExpression') {
+                // override old code style
+                options.codeStyle = 'default';
+              } else if (propTypesNode.type === 'ClassProperty') {
+                options.codeStyle = 'class';
+              }
+            } else if (componentNode.type === 'FunctionDeclaration' || componentNode.type === 'ArrowFunctionExpression') {
+              options.codeStyle = 'default';
+            }
+            let code = codeBuilder.buildPropTypes(propTypes, options);
+            if (propTypesNode) {
+              return replaceCode(filePath, propTypesNode.range, code);
+            } else {
+              let insertPosition;
+              if (options.codeStyle === 'class') {
+                if (componentNode.body) {
+                  insertPosition = componentNode.body.range[0] + 1;
+                  return insertCode(filePath, insertPosition, "\n  " + code + "\n");
+                }
+              } else {
+                insertPosition = componentNode.range[1];
+                return insertCode(filePath, insertPosition, "\n\n" + code);
+              }
+            }
+          });
+        }).then(result => {
+          if (options.autoImport !== 'disable') {
+            let { importNode, requireNode } = actions.findImportOrRequireModuleNode(ast, options);
+            let firstBody = ast.body[0];
+            let importCode = codeBuilder.buildImportCode(options);
+            if (!importNode && !requireNode && firstBody && importCode) {
+              let insertPosition = firstBody.range[0];
+              return insertCode(filePath, insertPosition, importCode + "\n");
+            }
+          }
+          return result;
+        }).then((result) => {
+          if (result) {
+            console.log('Generated Success!');
+          }
+        }).catch(error => {
+          console.error(error);
+        });
+      });
+    } catch (e) {
+      console.error(e);
+    }
+  })
+
+program.command('config')
+  .arguments('<filePath>')
+  .action(function(filePath){
+    let configPath = path.normalize(filePath);
+    try {
+      let json = fs.readFileSync(configPath, "utf-8") || {};
+      let config = Object.assign(readConfig(), JSON.parse(json));
+      if (config && saveConfig(JSON.stringify(config, null, 2))) {
+        console.log(styles.red, "Write Config Success");
+      } else {
+        console.log(styles.red, "JSON parse Fail !");
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  })
+
+program.parse(process.argv)
 
 function readConfig() {
   try {
@@ -166,6 +160,3 @@ function insertCode(file, position, code) {
     }
   });
 }
-
-
-run(process.argv.slice(2));
