@@ -242,9 +242,8 @@ function findUpdateSpecialPropTypes(typeNode, name) {
         let elements = calleeParams.elements || [];
         props.childTypes = elements.map(item => findUpdateSpecialPropTypes(item)).filter(item => !!item);
       }
-    } else if (calleeParams.type === 'MemberExpression') {
+    } else if (calleeParams.type === 'MemberExpression' || calleeParams.type === 'CallExpression') {
       // arrayOf、objectOf、instanceOf
-      let property = calleeParams.property;
       let childType = findUpdateSpecialPropTypes(calleeParams);
       if (childType) {
         props.childTypes = [childType]
