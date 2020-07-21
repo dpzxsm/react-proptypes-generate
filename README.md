@@ -1,6 +1,6 @@
 # react-proptypes-generate [![npm version](https://badge.fury.io/js/react-proptypes-generate.svg)](https://badge.fury.io/js/react-proptypes-generate)
   This is the VS Code's extension that automatically generates PropTypes code for React components, like [ReactPropTypes](https://github.com/dpzxsm/ReactPropTypes-Plugin) in the Jetbrains's Platform
-
+  Also a command line tool, you don’t have to be limited to use in vscode
 
 ## Installation
 ### VS Code
@@ -24,6 +24,27 @@ npm install react-proptypes-generate -g
 1. `rpg-cli -h` show Help
 2. `rpg-cli <JsFilePath> <ComponentName>` to generate `PropTypes`
 3. `rpg-cli config <JsonFilePath>` to config generated `Settings`
+4. `rpg-cli project <DirPath>` to batch generated `PropTypes` for many files
+
+If you want ian to always use the latest version, you can use npx to instead of `rpg-cli`, like：
+```
+npx react-proptypes-generate -h
+```
+
+### TypeScript Need to Know
+Because of the ast parser is `flow-parser`, so TypeScript sometimes generates strange types.
+Welcome to add.
+####  Already known Case
++ use `as` in the props's ES6 destruct, will generate redundant error types, like: 
+ ```javascript
+   let { age = 0 as number, students = [] } = props;
+   // will generated
+   Test.propTypes = {
+      number: PropTypes.any,
+      age: PropTypes.number,
+   }
+ ```
+
 
 ## Examples case
 ```jsx harmony
@@ -130,3 +151,9 @@ Command Line can config the following settings:
 ### [v1.5.6]
 - Fix `noMergeOld` settings that get inverse value
 - Support `Null Propagation`
+
+### [v1.6.0]
+- Support TypeScript
+- Support HOC Component
+- Support Batch generation of PropTypes, Now, only supports Command Line
+- Fix a bug when `arrayOf` type nest in `shape` type
