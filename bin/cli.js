@@ -56,7 +56,7 @@ function getProjectJavascriptFiles(filePath) {
   if (fileStat.isDirectory()) {
     const dirFiles = fs.readdirSync(filePath)
     for (let i = 0; i < dirFiles.length; i++) {
-      files.push(...getProjectJavascriptFiles(filePath))
+      files.push(...getProjectJavascriptFiles(path.join(filePath, dirFiles[i])))
     }
   } else {
     if (filePath.match(/\.(js|jsx|ts|tsx)$/)) {
