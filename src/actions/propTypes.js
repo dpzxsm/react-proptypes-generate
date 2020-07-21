@@ -110,40 +110,6 @@ function fixAllShapePropType(propTypes, options) {
   })
 }
 
-function findComponentNode(ast, options) {
-  let name = options.name;
-  let componentNode;
-  recast.visit(ast, {
-    visitClassDeclaration: function (path) {
-      const node = path.node;
-      if (node.id.name === name) {
-        componentNode = node;
-      }
-      this.traverse(path);
-    },
-    visitFunctionDeclaration: function (path) {
-      const node = path.node;
-      if (node.id && node.id.type === 'Identifier' && node.id.name === name) {
-        componentNode = node;
-      }
-      this.traverse(path);
-    },
-    visitArrowFunctionExpression: function (path) {
-      const node = path.node;
-      const parentNode = path.parentPath.node;
-      if (parentNode.type === 'VariableDeclarator' && parentNode.id && parentNode.id.type === 'Identifier' && parentNode.id.name === name) {
-        componentNode = node;
-      }
-      this.traverse(path);
-    }
-  });
-  if (componentNode) {
-    return Promise.resolve(componentNode);
-  } else {
-    return Promise.reject(new Error('The selected text is not a valid React Component !'));
-  }
-}
-
 function findPropTypesNode(ast, options) {
   let { name, alias } = options;
   let propTypesNode;
@@ -242,9 +208,8 @@ function findUpdateSpecialPropTypes(typeNode, name) {
         let elements = calleeParams.elements || [];
         props.childTypes = elements.map(item => findUpdateSpecialPropTypes(item)).filter(item => !!item);
       }
-    } else if (calleeParams.type === 'MemberExpression') {
+    } else if (calleeParams.type === 'MemberExpression' || calleeParams.type === 'CallExpression') {
       // arrayOf、objectOf、instanceOf
-      let property = calleeParams.property;
       let childType = findUpdateSpecialPropTypes(calleeParams);
       if (childType) {
         props.childTypes = [childType]
@@ -460,7 +425,6 @@ function findAndCompletePropTypes(ast, propTypes) {
 }
 
 exports.findPropTypes = findPropTypes;
-exports.findComponentNode = findComponentNode;
 exports.findPropTypesNode = findPropTypesNode;
 exports.findAndCompletePropTypes = findAndCompletePropTypes;
 exports.findPropTypesInPropTypeNode = findPropTypesInPropTypeNode;

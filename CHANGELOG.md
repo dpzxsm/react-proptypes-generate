@@ -46,3 +46,9 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ### [v1.5.6]
 - Fix `noMergeOld` settings that get inverse value
 - Support `Null Propagation`
+
+### [v1.6.0]
+- Support TypeScript
+- Support HOC Component
+- Support Batch generation of PropTypes, Now, only supports Command Line
+- Fix a bug when `arrayOf` type nest in `shape` type

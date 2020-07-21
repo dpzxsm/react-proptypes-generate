@@ -1,4 +1,4 @@
-export function Test(props) {
+export const Test = (props)  => {
   let { school: schoolAlias = "schoolName", info = { name: "test" }, age = 33, students = [] } = props;
   if(info.year === 2020){
     console.log("will generate year type as number");
@@ -11,7 +11,7 @@ export function Test(props) {
   </div>
 }
 
-export function Test2(props){
+export const Test2 = function(props){
   let { school: schoolAlias = "schoolName", info = { name: "test" }, age = 33, students = [] } = props;
   if(info.year === 2020){
     console.log("will generate year type as number");

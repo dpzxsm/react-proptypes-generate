@@ -2,7 +2,7 @@
     "name": "react-proptypes-generate",
     "displayName": "React PropTypes Generate",
     "description": "Auto generate react's propTypes",
-    "version": "1.5.6",
+    "version": "1.6.0",
     "publisher": "suming",
     "author": "suming",
     "license": "MIT",
@@ -107,9 +107,9 @@
         }
     },
     "scripts": {
-        "postinstall": "node ./postinstall",
+        "postinstall": "node ./scripts/postinstall.js",
         "compile": "node ./node_modules/vscode/bin/compile",
-        "start": "npm run webpack && code --extensionDevelopmentPath=/Users/user/sumingProjects/react-proptypes",
+        "start": "node ./scripts/start.js",
         "vscode:prepublish": "webpack --mode production",
         "webpack": "webpack --mode development",
         "webpack-dev": "webpack --mode development --watch",
