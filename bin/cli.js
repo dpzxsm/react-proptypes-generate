@@ -75,12 +75,14 @@ function parseAndGenerate(filePath, componentName) {
     let data = fs.readFileSync(normalizePath, "utf-8");
     if (data) {
       let ast = astHelper.flowAst(data);
-      names = actions.findComponentNames(ast)
+      actions.findComponentNames(ast).forEach(item => {
+        names.push(item.name);
+      })
     }
   }
   return Promise.reduce(names, function (total, name) {
     return generatePropTypes(normalizePath, name).then(() => {
-      console.log(normalizePath + ' Generated Success!');
+      console.log(filePath + ' ' + name + ' Generated Success!');
       return total + 1
     }).catch(error => {
       console.error(error)
@@ -132,15 +134,15 @@ function generatePropTypes(filePath, componentName) {
       if (propTypesNode) {
         return replaceCode(filePath, propTypesNode.range, code);
       } else {
-        let insertPosition;
         if (options.codeStyle === 'class') {
           if (componentNode.body) {
-            insertPosition = componentNode.body.range[0] + 1;
-            return insertCode(filePath, insertPosition, "\n  " + code + "\n");
+            return insertCode(filePath, componentNode.body.range[0] + 1, "\n  " + code + "\n");
           }
         } else {
-          insertPosition = componentNode.range[1];
-          return insertCode(filePath, insertPosition, "\n\n" + code);
+          let range = actions.findComponentParentRange(ast, componentName)
+          if (range) {
+            return insertCode(filePath, range[1], "\n\n" + code);
+          }
         }
       }
     });
