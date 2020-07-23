@@ -34,7 +34,6 @@ npx react-proptypes-generate -h
 
 ### TypeScript Need to Know
 Because of the ast parser is `flow-parser`, so TypeScript sometimes generates strange types.
-Welcome to add.
 ####  Already known Case
 + use `as` in the props's ES6 destruct, will generate redundant error types, like: 
  ```javascript
@@ -43,6 +42,7 @@ Welcome to add.
    Test.propTypes = {
       number: PropTypes.any,
       age: PropTypes.number,
+      students: PropTypes.array
    }
  ```
 
