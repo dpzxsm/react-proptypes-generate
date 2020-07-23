@@ -45,7 +45,14 @@ Because of the ast parser is `flow-parser`, so TypeScript sometimes generates st
       students: PropTypes.array
    }
  ```
-
++ Not Support convert Typescript’s type to PropType, like:
+```typescript
+    let age:number = props.age
+    // will generated
+    Test.propTypes = {
+       age: PropTypes.any,
+    }
+```
 
 ## Examples case
 ```jsx harmony
