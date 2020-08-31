@@ -115,7 +115,7 @@ Command Line can config the following settings:
 * `arrayLike`: If true, some shape type which is similar to Array will be set array type instead(boolean)
 * `isRequired`: If true, all PropTypes is will be set to isRequired(boolean)
 
-## Release Notes
+## CHANGELOG
 
 ### [v1.0]
 - Support VS Code and Command Line
@@ -166,3 +166,6 @@ Command Line can config the following settings:
 - Support HOC Component
 - Support Batch generation of PropTypes, Now, only supports Command Line
 - Fix a bug when `arrayOf` type nest in `shape` type
+
+### [v1.6.1]
+- Add Setting for PropTypes's  isRequired, named `isRequired`
