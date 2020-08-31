@@ -52,3 +52,6 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 - Support HOC Component
 - Support Batch generation of PropTypes, Now, only supports Command Line
 - Fix a bug when `arrayOf` type nest in `shape` type
+
+### [v1.6.1]
+- Add Setting for PropTypes's  isRequired, named `isRequired`

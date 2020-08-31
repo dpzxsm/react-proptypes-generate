@@ -87,6 +87,11 @@ function buildClassPropTypes(propTypes, options) {
 }
 
 function buildPropTypes(propTypes, options) {
+  if(options.isRequired){
+    propTypes.forEach(item => {
+      item.isRequired = true
+    })
+  }
   if (options.codeStyle === 'class') {
     return buildClassPropTypes(propTypes, options);
   } else {

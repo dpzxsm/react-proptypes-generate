@@ -2,7 +2,7 @@
     "name": "react-proptypes-generate",
     "displayName": "React PropTypes Generate",
     "description": "Auto generate react's propTypes",
-    "version": "1.6.0",
+    "version": "1.6.1",
     "publisher": "suming",
     "author": "suming",
     "license": "MIT",
@@ -102,6 +102,11 @@
                     "type": "boolean",
                     "default": false,
                     "description": "If true, some shape type which is similar to Array will be set array type instead"
+                },
+                "propTypes.isRequired": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "If true, all PropTypes is will be set to isRequired"
                 }
             }
         }

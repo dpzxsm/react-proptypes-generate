@@ -113,6 +113,7 @@ Command Line can config the following settings:
 * `noMergeOld`: Defaults is merge old PropTypes, if true, will generate new PropTypes(boolean)
 * `noShape`: Defaults is generate shape type, if true, will generate object type(boolean)
 * `arrayLike`: If true, some shape type which is similar to Array will be set array type instead(boolean)
+* `isRequired`: If true, all PropTypes is will be set to isRequired(boolean)
 
 ## Release Notes
 
