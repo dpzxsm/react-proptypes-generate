@@ -100,6 +100,7 @@ This extension contributes the following settings:
 * `propTypes.noMergeOld`: Defaults is merge old PropTypes, if true, will generate new PropTypes(boolean)
 * `propTypes.noShape`: Defaults is generate shape type, if true, will generate object type(boolean)
 * `propTypes.arrayLike`: If true, some shape type which is similar to Array will be set array type instead(boolean)
+* `isRequired`: If true, all PropTypes is will be set to isRequired(boolean)
 
 ## Command Line Settings
 
