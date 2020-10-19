@@ -170,3 +170,6 @@ Command Line can config the following settings:
 
 ### [v1.6.1]
 - Add Setting for PropTypes's  isRequired, named `isRequired`
+
+### [v1.6.2]
+- Support for destructured `shape` type

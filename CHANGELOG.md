@@ -55,3 +55,6 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ### [v1.6.1]
 - Add Setting for PropTypes's  isRequired, named `isRequired`
+
+### [v1.6.2]
+- Support for destructured `shape` type
