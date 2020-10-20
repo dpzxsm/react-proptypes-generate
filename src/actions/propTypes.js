@@ -126,7 +126,7 @@ function findPropTypesNode(ast, options) {
 				&& left.property.name === (alias || 'propTypes')
 				&& right.type === 'ObjectExpression'
 			) {
-				propTypesNode = node;
+				propTypesNode = path.parentPath.node;
 			}
 			this.traverse(path);
 		},
