@@ -20,8 +20,7 @@ program.version(manifest.version)
     filePath = path.normalize( filePath || "")
     parseAndGenerate({
       filePath,
-      componentName,
-      config: readConfig()
+      componentName
     })
   })
 
@@ -50,8 +49,7 @@ program.command('project')
     let files = getProjectJavascriptFiles(dirPath);
     for (let i = 0; i < files.length; i++) {
       parseAndGenerate({
-        filePath: files[i],
-        config: readConfig(dirPath)
+        filePath: files[i]
       })
     }
   })
@@ -75,7 +73,7 @@ function getProjectJavascriptFiles(filePath) {
 }
 
 function parseAndGenerate(builder) {
-  const {filePath, componentName, config} = builder;
+  const {filePath, componentName} = builder;
   let normalizePath = path.normalize(filePath);
   let names = [];
   if (componentName) {
@@ -91,7 +89,6 @@ function parseAndGenerate(builder) {
   }
   return Promise.reduce(names, function (total, name) {
     return generatePropTypes({
-      config,
       filePath: normalizePath,
       componentName: name,
     }).then(() => {
@@ -105,7 +102,7 @@ function parseAndGenerate(builder) {
 }
 
 function generatePropTypes(builder) {
-  const {filePath, componentName, config} = builder;
+  const {filePath, componentName} = builder;
   let data = fs.readFileSync(filePath, "utf-8");
   if (!data) {
     return Promise.reject(new Error('can\'t resolve filePath: ' + filePath));
@@ -115,7 +112,7 @@ function generatePropTypes(builder) {
     name: componentName
   };
   // merge config to options
-  let options = Object.assign({}, config, params);
+  let options = Object.assign({}, readConfig(), params);
   return Promise.all([
     actions.findComponentNode(ast, options),
     actions.findPropTypesNode(ast, options),
@@ -174,10 +171,10 @@ function generatePropTypes(builder) {
   })
 }
 
-function readConfig(dirPath) {
+function readConfig() {
   try {
     let defaultConfig = JSON.parse(fs.readFileSync(path.join(__dirname, "setting.json"), "utf-8"));
-    let userConfigPath = path.join(dirPath || process.cwd(), 'rpg.config.json')
+    let userConfigPath = path.join(process.cwd(), 'rpg.config.json')
     let userConfig = fs.existsSync(userConfigPath) ?
       JSON.parse(fs.readFileSync(userConfigPath, "utf-8")) :{};
     return Object.assign(defaultConfig, userConfig);
