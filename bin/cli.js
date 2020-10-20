@@ -17,7 +17,7 @@ const styles = {
 program.version(manifest.version)
   .arguments('<filePath> [componentName]')
   .action(function (filePath, componentName) {
-    filePath = path.join(process.cwd(), filePath || "")
+    filePath = path.normalize( filePath || "")
     parseAndGenerate({
       filePath,
       componentName,
@@ -28,7 +28,7 @@ program.version(manifest.version)
 program.command('config')
   .arguments('<filePath>')
   .action(function (filePath) {
-    filePath = path.join(process.cwd(), filePath || "");
+    filePath = path.normalize(filePath || "");
     try {
       let json = fs.readFileSync(filePath, "utf-8") || {};
       let config = Object.assign(readConfig(), JSON.parse(json));
@@ -46,7 +46,7 @@ program.command('project')
   .arguments('[dirPath]')
   .option('-c --config <type>', 'config json path')
   .action(function (dirPath) {
-    dirPath = path.join(process.cwd(), dirPath || "");
+    dirPath = path.join(dirPath || "");
     let files = getProjectJavascriptFiles(dirPath);
     for (let i = 0; i < files.length; i++) {
       parseAndGenerate({
@@ -177,7 +177,7 @@ function generatePropTypes(builder) {
 function readConfig(dirPath) {
   try {
     let defaultConfig = JSON.parse(fs.readFileSync(path.join(__dirname, "setting.json"), "utf-8"));
-    let userConfigPath = path.join(dirPath || "", 'rpg.config.json')
+    let userConfigPath = path.join(dirPath || process.cwd(), 'rpg.config.json')
     let userConfig = fs.existsSync(userConfigPath) ?
       JSON.parse(fs.readFileSync(userConfigPath, "utf-8")) :{};
     return Object.assign(defaultConfig, userConfig);
