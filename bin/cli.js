@@ -38,7 +38,7 @@ program.command('config')
         console.log(styles.red, "JSON parse Fail !");
       }
     } catch (e) {
-      console.error(e);
+      console.error(e.toString());
     }
   })
 
