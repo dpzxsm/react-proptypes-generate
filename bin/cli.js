@@ -132,7 +132,7 @@ function generatePropTypes(builder) {
         throw new Error("Not find any props");
       }
       if (propTypesNode) {
-        if (propTypesNode.type === 'AssignmentExpression') {
+        if (propTypesNode.type === 'ExpressionStatement') {
           // override old code style
           options.codeStyle = 'default';
         } else if (propTypesNode.type === 'ClassProperty') {
