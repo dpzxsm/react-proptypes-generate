@@ -18,15 +18,19 @@ program.version(manifest.version)
   .arguments('<filePath> [componentName]')
   .action(function (filePath, componentName) {
     filePath = path.join(process.cwd(), filePath || "")
-    parseAndGenerate(filePath, componentName)
+    parseAndGenerate({
+      filePath,
+      componentName,
+      config: readConfig()
+    })
   })
 
 program.command('config')
   .arguments('<filePath>')
   .action(function (filePath) {
-    let configPath = path.normalize(filePath);
+    filePath = path.join(process.cwd(), filePath || "");
     try {
-      let json = fs.readFileSync(configPath, "utf-8") || {};
+      let json = fs.readFileSync(filePath, "utf-8") || {};
       let config = Object.assign(readConfig(), JSON.parse(json));
       if (config && saveConfig(JSON.stringify(config, null, 2))) {
         console.log(styles.red, "Write Config Success");
@@ -40,11 +44,15 @@ program.command('config')
 
 program.command('project')
   .arguments('[dirPath]')
+  .option('-c --config <type>', 'config json path')
   .action(function (dirPath) {
-    dirPath = path.join(process.cwd(), dirPath || "")
-    let files = getProjectJavascriptFiles(dirPath)
+    dirPath = path.join(process.cwd(), dirPath || "");
+    let files = getProjectJavascriptFiles(dirPath);
     for (let i = 0; i < files.length; i++) {
-      parseAndGenerate(files[i])
+      parseAndGenerate({
+        filePath: files[i],
+        config: readConfig(dirPath)
+      })
     }
   })
 
@@ -66,7 +74,8 @@ function getProjectJavascriptFiles(filePath) {
   return files;
 }
 
-function parseAndGenerate(filePath, componentName) {
+function parseAndGenerate(builder) {
+  const {filePath, componentName, config} = builder;
   let normalizePath = path.normalize(filePath);
   let names = [];
   if (componentName) {
@@ -81,7 +90,11 @@ function parseAndGenerate(filePath, componentName) {
     }
   }
   return Promise.reduce(names, function (total, name) {
-    return generatePropTypes(normalizePath, name).then(() => {
+    return generatePropTypes({
+      config,
+      filePath: normalizePath,
+      componentName: name,
+    }).then(() => {
       console.log(filePath + ' ' + name + ' Generated Success!');
       return total + 1
     }).catch(error => {
@@ -91,7 +104,8 @@ function parseAndGenerate(filePath, componentName) {
   }, 0)
 }
 
-function generatePropTypes(filePath, componentName) {
+function generatePropTypes(builder) {
+  const {filePath, componentName, config} = builder;
   let data = fs.readFileSync(filePath, "utf-8");
   if (!data) {
     return Promise.reject(new Error('can\'t resolve filePath: ' + filePath));
@@ -101,7 +115,7 @@ function generatePropTypes(filePath, componentName) {
     name: componentName
   };
   // merge config to options
-  let options = Object.assign({}, readConfig(), params);
+  let options = Object.assign({}, config, params);
   return Promise.all([
     actions.findComponentNode(ast, options),
     actions.findPropTypesNode(ast, options),
@@ -160,10 +174,13 @@ function generatePropTypes(filePath, componentName) {
   })
 }
 
-function readConfig() {
+function readConfig(dirPath) {
   try {
-    let json = fs.readFileSync(path.join(__dirname, "setting.json"), "utf-8");
-    return JSON.parse(json);
+    let defaultConfig = JSON.parse(fs.readFileSync(path.join(__dirname, "setting.json"), "utf-8"));
+    let userConfigPath = path.join(dirPath || "", 'rpg.config.json')
+    let userConfig = fs.existsSync(userConfigPath) ?
+      JSON.parse(fs.readFileSync(userConfigPath, "utf-8")) :{};
+    return Object.assign(defaultConfig, userConfig);
   } catch (e) {
     return {};
   }

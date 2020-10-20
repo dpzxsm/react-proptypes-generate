@@ -58,3 +58,6 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ### [v1.6.2]
 - Support for destructured `shape` type
+
+### [v1.6.3]
+- Add `semicolon` settings for code style;

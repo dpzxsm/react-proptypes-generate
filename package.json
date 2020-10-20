@@ -2,7 +2,7 @@
     "name": "react-proptypes-generate",
     "displayName": "React PropTypes Generate",
     "description": "Auto generate react's propTypes",
-    "version": "1.6.2",
+    "version": "1.6.3",
     "publisher": "suming",
     "author": "suming",
     "license": "MIT",
@@ -83,10 +83,15 @@
                     "default": false,
                     "description": "Controls the printing of trailing commas in object literals, array expressions and function parameters"
                 },
+                "propTypes.semicolon": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "If true, there will be a semicolon after PropType statement"
+                },
                 "propTypes.afterFormat": {
                     "type": "boolean",
                     "default": false,
-                    "description": "if true, after generate propTypes, trigger vscode's formatting for PropTypes"
+                    "description": "If true, after generate propTypes, trigger vscode's formatting for PropTypes"
                 },
                 "propTypes.noMergeOld": {
                     "type": "boolean",

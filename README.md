@@ -30,7 +30,12 @@ npm install react-proptypes-generate -g
 If you want ian to always use the latest version, you can use npx to instead of `rpg-cli`, like：
 ```
 npx react-proptypes-generate -h
+npx react-proptypes-generate ./examples/index.jsx Test
+npx react-proptypes-generate setting.json
+npx react-proptypes-generate project ./examples/
 ```
+
+When you are use `project` command, If you want to every project have different config, you can create a json file named `rpg.config.json` and put it in root folder.
 
 ### TypeScript Need to Know
 Because of the ast parser is `flow-parser`, so TypeScript sometimes generates strange types.
@@ -96,6 +101,7 @@ This extension contributes the following settings:
 * `propTypes.tabWidth`: Number of spaces the pretty-printer should use per tab for indentation (number)
 * `propTypes.quote`: Override the quotes used in string literals(single|double|auto|null)
 * `propTypes.trailingComma`: Controls the printing of trailing commas in object literals, array expressions and function parameters(boolean)
+* `propTypes.semicolon`: If true, there will be a semicolon after PropType statement
 * `propTypes.afterFormat`: If true, after generate propTypes, trigger vscode's formatting for PropTypes(boolean)
 * `propTypes.noMergeOld`: Defaults is merge old PropTypes, if true, will generate new PropTypes(boolean)
 * `propTypes.noShape`: Defaults is generate shape type, if true, will generate object type(boolean)
@@ -111,6 +117,7 @@ Command Line can config the following settings:
 * `tabWidth`: Number of spaces the pretty-printer should use per tab for indentation (number)
 * `quote`: Override the quotes used in string literals(single|double|auto|null)
 * `trailingComma`: Controls the printing of trailing commas in object literals, array expressions and function parameters(boolean)
+* `semicolon`: If true, there will be a semicolon after PropType statement
 * `noMergeOld`: Defaults is merge old PropTypes, if true, will generate new PropTypes(boolean)
 * `noShape`: Defaults is generate shape type, if true, will generate object type(boolean)
 * `arrayLike`: If true, some shape type which is similar to Array will be set array type instead(boolean)
@@ -173,3 +180,7 @@ Command Line can config the following settings:
 
 ### [v1.6.2]
 - Support for destructured `shape` type
+
+### [v1.6.3]
+- Add `semicolon` settings for code style;
+- Command Line Support `rpg.config.json` for `project` command; 
