@@ -37,6 +37,26 @@ npx react-proptypes-generate project ./examples/
 
 When you are use `project` command, If you want to every project have different config, you can create a json file named `rpg.config.json` and put it in root folder.
 
+### With lint-staged 
+
+```
+    npm install react-proptypes-generate --save-dev 
+    or
+    yarn add react-proptypes-generate -D
+```
+
+#### edit in package.json
+```json
+{
+    "lint-staged": {
+        "**/*.{js,jsx,ts,tsx}": [
+          "rpg-cli",
+          "eslint --fix --ext .js,.jsx,.ts,.tsx"
+        ]
+    }
+}
+```
+
 ### TypeScript Need to Know
 Because of the ast parser is `flow-parser`, so TypeScript sometimes generates strange types.
 ####  Already known Case
