@@ -45,7 +45,7 @@ If you want to every project have different config, you can create a json file n
 
 ### Project with lint-staged
 
-####Config Git precommit hooks
+#### Config Git precommit hooks
 you can use npm precommit 
 ```json
 {
@@ -65,7 +65,7 @@ or use husky by ```npm install --save-dev husky```
 }
 ```
 
-####Config lint-staged, like: 
+#### Config lint-staged, like: 
 ```json
 {
     "lint-staged": {
