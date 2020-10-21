@@ -37,7 +37,7 @@ npx react-proptypes-generate project ./examples/
 
 When you are use `project` command, If you want to every project have different config, you can create a json file named `rpg.config.json` and put it in root folder.
 
-### With lint-staged 
+### Use with lint-staged 
 
 ```
     npm install react-proptypes-generate --save-dev 
