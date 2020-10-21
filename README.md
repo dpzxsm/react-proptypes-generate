@@ -62,8 +62,7 @@ edit package.json file
 {
     "lint-staged": {
         "**/*.{js,jsx,ts,tsx}": [
-          "rpg-cli",
-          "eslint --fix --ext .js,.jsx,.ts,.tsx"
+          "rpg-cli"
         ]
     }
 }
