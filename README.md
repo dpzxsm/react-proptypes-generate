@@ -14,9 +14,9 @@ npm install react-proptypes-generate -g
 
 ### Project with lint-staged
 ```
-    npm install --save-dev react-proptypes-generate lint-staged
+    npm install --save-dev react-proptypes-generate lint-staged husky
     or
-    yarn add react-proptypes-generate lint-staged -D
+    yarn add react-proptypes-generate lint-staged husky -D
 ```
 
 ## Usage
@@ -44,17 +44,9 @@ npx react-proptypes-generate project ./examples/
 If you want to every project have different config, you can create a json file named `rpg.config.json` and put it in root folder.
 
 ### Project with lint-staged
+edit package.json file
 
 #### Config Git precommit hooks
-you can use npm precommit 
-```json
-{
-    "scripts": {
-       "precommit": "lint-staged"
-    }
-}
-```
-or use husky by ```npm install --save-dev husky```
 ```json
 {
   "husky": {
