@@ -1,7 +1,6 @@
 # react-proptypes-generate [![npm version](https://badge.fury.io/js/react-proptypes-generate.svg)](https://badge.fury.io/js/react-proptypes-generate)
   This is the VS Code's extension that automatically generates PropTypes code for React components, like [ReactPropTypes](https://github.com/dpzxsm/ReactPropTypes-Plugin) in the Jetbrains's Platform.
-  
-  Also a command line tool, you don’t have to be limited to use in vscode
+  Also a command line tool, you don’t have to be limited to use in vscode. If you want fully automatic PropTypes generation, You can also use with lint-staged.
 
 ## Installation
 ### VS Code
@@ -11,6 +10,13 @@
 If you want to use it directly on the command line, you can install cli by npm install.
 ```
 npm install react-proptypes-generate -g
+```
+
+### Project with lint-staged
+```
+    npm install --save-dev react-proptypes-generate lint-staged
+    or
+    yarn add react-proptypes-generate lint-staged -D
 ```
 
 ## Usage
@@ -37,15 +43,29 @@ npx react-proptypes-generate project ./examples/
 
 If you want to every project have different config, you can create a json file named `rpg.config.json` and put it in root folder.
 
-### Use with lint-staged 
+### Project with lint-staged
 
+####Config Git precommit hooks
+you can use npm precommit 
+```json
+{
+    "scripts": {
+       "precommit": "lint-staged"
+    }
+}
 ```
-    npm install react-proptypes-generate --save-dev 
-    or
-    yarn add react-proptypes-generate -D
+or use husky by ```npm install --save-dev husky```
+```json
+{
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run lint-staged"
+    }
+  }
+}
 ```
 
-#### edit in package.json
+####Config lint-staged, like: 
 ```json
 {
     "lint-staged": {
