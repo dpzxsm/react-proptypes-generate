@@ -31,7 +31,8 @@ npm install react-proptypes-generate -g
 1. `rpg-cli -h` show Help
 2. `rpg-cli <JsFilePath> <ComponentName>` to generate `PropTypes`
 3. `rpg-cli config <JsonFilePath>` to config generated `Settings`
-4. `rpg-cli project <DirPath>` to batch generated `PropTypes` for many files
+4. `rpg-cli project <DirPath>` to batch generated `PropTypes` for Project
+5. `rpg-cli fix <files...>` to batch generated `PropTypes` for many files
 
 If you want ian to always use the latest version, you can use npx to instead of `rpg-cli`, like：
 ```
@@ -39,6 +40,7 @@ npx react-proptypes-generate -h
 npx react-proptypes-generate ./examples/index.jsx Test
 npx react-proptypes-generate setting.json
 npx react-proptypes-generate project ./examples/
+npx react-proptypes-generate fix index.jsx index2.jsx src/index3.js
 ```
 
 If you want to every project have different config, you can create a json file named `rpg.config.json` and put it in root folder.
@@ -62,7 +64,7 @@ edit package.json file
 {
     "lint-staged": {
         "**/*.{js,jsx,ts,tsx}": [
-          "rpg-cli"
+          "rpg-cli fix"
         ]
     }
 }
@@ -215,3 +217,6 @@ Command Line can config the following settings:
 ### [v1.6.3]
 - Add `semicolon` settings for code style;
 - Command Line Support `rpg.config.json` for `project` command; 
+
+### [v1.6.7]
+- Add `lint-stage` Full Support
