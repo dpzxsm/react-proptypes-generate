@@ -44,6 +44,21 @@ npx react-proptypes-generate fix index.jsx index2.jsx src/index3.js
 ```
 
 If you want to every project have different config, you can create a json file named `rpg.config.json` and put it in root folder.
+`rpg.config.json` examples:
+```json
+{
+  "autoImport": "ES6",
+  "codeStyle": "default",
+  "noMergeOld": false,
+  "noShape": false,
+  "tabWidth": 2,
+  "quote": "double",
+  "trailingComma": false,
+  "semicolon": true,
+  "arrayLike": true,
+  "isRequired": false
+}
+```
 
 ### Project with lint-staged
 edit package.json file
