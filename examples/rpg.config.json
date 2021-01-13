@@ -6,7 +6,7 @@
   "tabWidth": 2,
   "quote": null,
   "trailingComma": false,
-  "semicolon": true,
+  "semicolon": false,
   "arrayLike": true,
   "isRequired": true
 }

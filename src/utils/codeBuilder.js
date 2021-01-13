@@ -16,6 +16,7 @@ const {
 	importDeclaration,
 	importDefaultSpecifier,
 	literal,
+	line,
 	property
 } = recast.types.builders;
 
@@ -70,20 +71,39 @@ function buildArrayExpression(propTypes) {
 }
 
 function buildObjectExpression(propTypes) {
-	return objectExpression(propTypes.map(item => {
-		return property('init', id(item.name), buildMemberExpression(item));
-	}));
+	let properties = propTypes.map((item, index) => {
+		let propertyNode = property('init', id(item.name), buildMemberExpression(item));
+		let lastItem = propTypes[index - 1];
+		if (lastItem && lastItem.comment) {
+			propertyNode.comments = [line(lastItem.comment)];
+		}
+		return propertyNode;
+	});
+	let finalItem = propTypes[propTypes.length - 1];
+	if (finalItem && finalItem.comment) {
+		let empty = property('init', id("_null"), id("_null"));
+		empty.comments = [line(finalItem.comment)];
+		properties.push(empty);
+	}
+	return objectExpression(properties);
 }
 
 function buildES6PropTypes(propTypes, options) {
 	let ast = assignmentExpression('=',
 		memberExpression(id(options.name), id('propTypes')), buildObjectExpression(propTypes));
-	return recast.prettyPrint(ast, setting.getCodeStyle(options)).code.replace(/(\r\n|[\n|\r]){2}/g, '$1');
+	return recast.prettyPrint(ast, setting.getCodeStyle(options)).code
+		.replace(/(\r\n|\n|\r)\1/g, '$1') // 替换多余的换行符
+		.replace(/\s*(\/\/.*)/g, ' $1') // 替换注释前面的换行
+		.replace(/\s*_null: _null/g, ''); // 替换占位字符串
 }
 
 function buildClassPropTypes(propTypes, options) {
 	let ast = classProperty(id('propTypes'), buildObjectExpression(propTypes), null, true);
-	return recast.prettyPrint(ast, setting.getCodeStyle(options)).code.replace(/(\r\n|[\n|\r]){2}/g, '$1').replace(/([\n|\r])/g, '$1  ');
+	return recast.prettyPrint(ast, setting.getCodeStyle(options)).code
+		.replace(/(\r\n|\n|\r)\1/g, '$1')  // 替换多余的换行符
+		.replace(/(\r\n|\n|\r)/g, '$1  ') // 替换最后一行的换行符
+		.replace(/\s*(\/\/.*)/g, ' $1') // 替换注释前面的换行
+		.replace(/\s*_null: _null/g, ''); // 替换占位字符串
 }
 
 function buildPropTypes(propTypes, options) {

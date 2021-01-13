@@ -4,10 +4,22 @@ export function Test(props) {
   if(info.year === 2020){
     console.log("will generate year type as number");
   }
-  // support deep find
   let childInfo = info.child.info;
-  // support null js null propagation
   return <div onClick={() => props?.onClick()}>
     {students.map((student, index) =><div key={index}>{item.name}</div>)}
   </div>
+}
+
+Test.propTypes = {
+  age: PropTypes.number.isRequired, // age
+  info: PropTypes.shape({  // error in info
+    child: PropTypes.shape({
+      info: PropTypes.any // info.child.info
+    }),
+    name: PropTypes.string,
+    year: PropTypes.number // info.year
+  }).isRequired, // info
+  onClick: PropTypes.func.isRequired,
+  school: PropTypes.string.isRequired,
+  students: PropTypes.array.isRequired // students
 }

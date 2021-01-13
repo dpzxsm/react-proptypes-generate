@@ -6,14 +6,14 @@ const propTypesHelper = require('../utils/propTypesHelper');
 const setting = require('../setting');
 const constants = require('../constants');
 
-function findPropTypes({ componentNode, propTypesNode, defaultPropsNode }, options) {
+function findPropTypes({ componentNode, propTypesNode, defaultPropsNode }, options, comments = []) {
 	let actions = [
 		findPropTypesByPropsIdentity(componentNode, options), //代码生成类型
 		findPropTypesInDefaultPropsNode(defaultPropsNode, options), //默认类型
 	];
 	if (!options.noMergeOld) {
 		//优先级最高，必须确保已经填写的PropTypes级别最高
-		actions.push(findPropTypesInPropTypeNode(propTypesNode));
+		actions.push(findPropTypesInPropTypeNode(propTypesNode, comments));
 	}
 	return Promise.all(actions).then((results) => {
 		return results.reduce((total = [], current = []) => {
@@ -157,8 +157,8 @@ function findPropTypesNode(ast, options) {
 	}
 }
 
-function findUpdateSpecialPropTypes(typeNode, name) {
-	let props = new PropTypes(name);
+function findUpdateSpecialPropTypes(typeNode, name, comments = []) {
+	let props = new PropTypes(name); // name可能为空
 	let callee, calleeParams;
 	if (typeNode.type === 'CallExpression') {
 		callee = typeNode.callee;
@@ -198,7 +198,7 @@ function findUpdateSpecialPropTypes(typeNode, name) {
 		}
 		if (calleeParams.type === 'ObjectExpression') {
 			// shape or exact
-			props.childTypes = findPropTypesInObjectNode(calleeParams);
+			props.childTypes = findPropTypesInObjectNode(calleeParams, comments);
 		} else if (calleeParams.type === 'ArrayExpression') {
 			// oneOf、oneOfType
 			if (props.type === 'oneOf') {
@@ -206,11 +206,11 @@ function findUpdateSpecialPropTypes(typeNode, name) {
 				props.ast = calleeParams;
 			} else {
 				let elements = calleeParams.elements || [];
-				props.childTypes = elements.map(item => findUpdateSpecialPropTypes(item)).filter(item => !!item);
+				props.childTypes = elements.map(item => findUpdateSpecialPropTypes(item, null, comments)).filter(item => !!item);
 			}
 		} else if (calleeParams.type === 'MemberExpression' || calleeParams.type === 'CallExpression') {
 			// arrayOf、objectOf、instanceOf
-			let childType = findUpdateSpecialPropTypes(calleeParams);
+			let childType = findUpdateSpecialPropTypes(calleeParams, null, comments);
 			if (childType) {
 				props.childTypes = [childType];
 			}
@@ -221,27 +221,34 @@ function findUpdateSpecialPropTypes(typeNode, name) {
 	return props;
 }
 
-function findPropTypesInObjectNode(objectNode) {
+function findPropTypesInObjectNode(objectNode, comments = []) {
 	let propTypes = [];
 	if (objectNode && objectNode.type === 'ObjectExpression') {
 		let properties = objectNode.properties || [];
 		for (let i = 0; i < properties.length; i++) {
 			let key = properties[i].key;
 			let value = properties[i].value;
-			propTypes.push(findUpdateSpecialPropTypes(value, key.name));
+			let propType = findUpdateSpecialPropTypes(value, key.name, comments);
+			if (propType) {
+				let start = value.range[1];
+				let end = (i === properties.length - 1) ? objectNode.range[1] : properties[i + 1].value.range[0];
+				let commentNode = comments.find(comment => comment.range[0] > start && comment.range[1] < end);
+				commentNode && (propType.comment = commentNode.value);
+				propTypes.push(propType)
+			}
 		}
 	}
 	return propTypes;
 }
 
-function findPropTypesInPropTypeNode(propNode) {
+function findPropTypesInPropTypeNode(propNode, comments) {
 	if (!propNode) {
 		return [];
 	}
 	if (propNode.type === 'ClassProperty' && propNode.static) {
-		return findPropTypesInObjectNode(propNode.value);
-	} else if (propNode.type === 'AssignmentExpression') {
-		return findPropTypesInObjectNode(propNode.right);
+		return findPropTypesInObjectNode(propNode.value, comments);
+	} else if (propNode.type === 'ExpressionStatement' && propNode.expression.type === 'AssignmentExpression') {
+		return findPropTypesInObjectNode(propNode.expression.right, comments);
 	} else {
 		return [];
 	}
@@ -451,4 +458,3 @@ function findAndCompletePropTypes(ast, propTypes) {
 exports.findPropTypes = findPropTypes;
 exports.findPropTypesNode = findPropTypesNode;
 exports.findAndCompletePropTypes = findAndCompletePropTypes;
-exports.findPropTypesInPropTypeNode = findPropTypesInPropTypeNode;

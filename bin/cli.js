@@ -7,6 +7,7 @@ const { program } = require('commander');
 const astHelper = require("../src/astHelper");
 const actions = require("../src/actions");
 const codeBuilder = require("../src/utils/codeBuilder");
+const actionHelper = require("../src/utils/actionHelper");
 const manifest = require("../package.json");
 
 const styles = {
@@ -120,40 +121,12 @@ function generatePropTypes(builder) {
 		return Promise.reject(new Error('can\'t resolve filePath: ' + filePath));
 	}
 	let ast = astHelper.flowAst(data);
-	let params = {
-		name: componentName
-	};
-	// merge config to options
-	let options = Object.assign({}, readConfig(), params);
-	return Promise.all([
-		actions.findComponentNode(ast, options),
-		actions.findPropTypesNode(ast, options),
-		actions.findPropTypesNode(ast, Object.assign({}, options, {
-			alias: 'defaultProps'
-		}))
-	], options).then((nodes) => {
-		let componentNode = nodes[0];
-		let propTypesNode = nodes[1];
-		let defaultPropsNode = nodes[2];
-		return actions.findPropTypes({
-			componentNode,
-			propTypesNode,
-			defaultPropsNode
-		}, options).then((propTypes) => {
-			if (propTypes.length === 0) {
-				throw new Error("Not find any props");
-			}
-			if (propTypesNode) {
-				if (propTypesNode.type === 'ExpressionStatement') {
-					// override old code style
-					options.codeStyle = 'default';
-				} else if (propTypesNode.type === 'ClassProperty') {
-					options.codeStyle = 'class';
-				}
-			} else if (componentNode.type === 'FunctionDeclaration' || componentNode.type === 'ArrowFunctionExpression') {
-				options.codeStyle = 'default';
-			}
-			let code = codeBuilder.buildPropTypes(propTypes, options);
+	if (!ast) {
+		return Promise.reject(new Error('Parse JS file error !'));
+	}
+	let options = Object.assign({}, readConfig(), { name: componentName });
+	return actionHelper.generatePropTypesCode(ast, options)
+		.then(({ code, propTypesNode, componentNode }) => {
 			if (propTypesNode) {
 				return replaceCode(filePath, propTypesNode.range, code);
 			} else {
@@ -168,19 +141,18 @@ function generatePropTypes(builder) {
 					}
 				}
 			}
-		});
-	}).then(result => {
-		if (options.autoImport !== 'disable') {
-			let { importNode, requireNode } = actions.findImportOrRequireModuleNode(ast, options);
-			let firstBody = ast.body[0];
-			let importCode = codeBuilder.buildImportCode(options);
-			if (!importNode && !requireNode && firstBody && importCode) {
-				let insertPosition = firstBody.range[0];
-				return insertCode(filePath, insertPosition, importCode + "\n");
+		}).then(result => {
+			if (options.autoImport !== 'disable') {
+				let { importNode, requireNode } = actions.findImportOrRequireModuleNode(ast, options);
+				let firstBody = ast.body[0];
+				let importCode = codeBuilder.buildImportCode(options);
+				if (!importNode && !requireNode && firstBody && importCode) {
+					let insertPosition = firstBody.range[0];
+					return insertCode(filePath, insertPosition, importCode + "\n");
+				}
 			}
-		}
-		return result;
-	});
+			return result;
+		});
 }
 
 function readConfig() {
