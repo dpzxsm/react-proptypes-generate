@@ -1,8 +1,9 @@
 #!/usr/bin/env node
-
 const path = require("path");
 const fs = require("fs");
 const Promise = require("bluebird");
+const glob = require("glob");
+const globToRegex = require("glob-to-regexp");
 const { program } = require('commander');
 const astHelper = require("../src/astHelper");
 const actions = require("../src/actions");
@@ -14,7 +15,7 @@ const styles = {
 	'black': '\x1B[30m%s\x1B[39m', 'blue': '\x1B[34m%s\x1B[39m', 'green': '\x1B[32m%s\x1B[39m',
 	'red': '\x1B[31m%s\x1B[39m', 'yellow': '\x1B[33m%s\x1B[39m'
 };
-
+// 基础命令，为指定文件生成
 program.version(manifest.version)
 	.arguments('<filePath> [componentName]')
 	.action(function (filePath, componentName) {
@@ -25,18 +26,21 @@ program.version(manifest.version)
 		});
 	});
 
-
+// lint-stage 自动化生成
 program.command('fix')
 	.arguments('<files...>')
 	.action(function (files) {
+		const config = readConfig();
 		for (let i = 0; i < files.length; i++) {
 			let filePath = path.normalize(files[i] || "");
 			parseAndGenerate({
-				filePath
+				filePath,
+				config
 			});
 		}
 	});
 
+// 全局配置
 program.command('config')
 	.arguments('<filePath>')
 	.action(function (filePath) {
@@ -54,40 +58,64 @@ program.command('config')
 		}
 	});
 
+// 项目批量生成
 program.command('project')
 	.arguments('[dirPath]')
-	.option('-c --config <type>', 'config json path')
 	.action(function (dirPath) {
-		dirPath = path.join(dirPath || "");
-		let files = getProjectJavascriptFiles(dirPath);
-		for (let i = 0; i < files.length; i++) {
-			parseAndGenerate({
-				filePath: files[i]
-			});
-		}
+		dirPath = path.join(process.cwd(), dirPath || "");
+		const config = readConfig();
+		getProjectFiles({
+			dirPath,
+			config
+		}).then(files => {
+			for (let i = 0; i < files.length; i++) {
+				parseAndGenerate({
+					filePath: files[i],
+					config
+				});
+			}
+		});
 	});
 
-program.parse(process.argv);
-
-function getProjectJavascriptFiles(filePath) {
-	const files = [];
-	const fileStat = fs.statSync(filePath);
-	if (fileStat.isDirectory()) {
-		const dirFiles = fs.readdirSync(filePath);
-		for (let i = 0; i < dirFiles.length; i++) {
-			files.push(...getProjectJavascriptFiles(path.join(filePath, dirFiles[i])));
-		}
-	} else {
-		if (filePath.match(/\.(js|jsx|ts|tsx)$/)) {
-			files.push(filePath);
-		}
-	}
-	return files;
+// 递归获取项目下的所有文件
+function getProjectFiles(builder) {
+	const { dirPath, config } = builder;
+	let include = config.include || [];
+	let exclude = config.exclude || [];
+	const globPattern = include.length > 0 ?
+		(include.length === 1 ? include[0] : `{${include.join(",")}}`)
+		: '**/*.{js,jsx,ts,tsx}';
+	return new Promise((resolve, reject) => {
+		glob(globPattern, {
+			cwd: dirPath,
+			ignore: exclude,
+			nodir: true
+		}, (err, files) => {
+			if (err) {
+				console.error(err);
+				reject(err);
+			} else {
+				resolve(files);
+			}
+		});
+	});
 }
 
+// 生成PropTypes
 function parseAndGenerate(builder) {
-	const { filePath, componentName } = builder;
+	const { filePath, componentName, config } = builder;
 	let normalizePath = path.normalize(filePath);
+
+	if (config) {
+		let include = config.include || [];
+		let exclude = config.exclude || [];
+		let includeMatch = include.length > 0 ? include.some(glob => globToRegex(glob).test(normalizePath)) : true;
+		let excludeMatch = include.length > 0 ? exclude.some(glob => globToRegex(glob).test(normalizePath)) : false;
+		if (!includeMatch || excludeMatch) {
+			console.log(filePath + ' is be excluded !');
+			return Promise.resolve(0);
+		}
+	}
 	let names = [];
 	if (componentName) {
 		names.push(componentName);
@@ -201,3 +229,5 @@ function insertCode(file, position, code) {
 		}
 	});
 }
+
+program.parse(process.argv);

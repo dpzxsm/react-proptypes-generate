@@ -141,6 +141,7 @@
         "deepmerge": "^4.2.2",
         "flow-parser": "^0.86.0",
         "glob": "^7.1.6",
+        "glob-to-regexp": "^0.4.1",
         "recast": "^0.16.0"
     },
     "keywords": [

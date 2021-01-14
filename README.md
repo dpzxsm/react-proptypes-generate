@@ -45,7 +45,7 @@ npx react-proptypes-generate fix index.jsx index2.jsx src/index3.js
 
 If you want to every project have different config, you can create a json file named `rpg.config.json` and put it in root folder.
 `rpg.config.json` examples:
-```json
+```json5
 {
   "autoImport": "ES6",
   "codeStyle": "default",
@@ -56,7 +56,13 @@ If you want to every project have different config, you can create a json file n
   "trailingComma": false,
   "semicolon": true,
   "arrayLike": true,
-  "isRequired": false
+  "isRequired": false,
+  "include": [
+    "src/**/*"  // support glob
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }
 ```
 
@@ -170,6 +176,8 @@ Command Line can config the following settings:
 * `noShape`: Defaults is generate shape type, if true, will generate object type(boolean)
 * `arrayLike`: If true, some shape type which is similar to Array will be set array type instead(boolean)
 * `isRequired`: If true, all PropTypes is will be set to isRequired(boolean)
+* `include`: Match need generated files, only used in `fix` and `project`(array)
+* `exclude`: Match node need generated files, only used in `fix` and `project`(array)
 
 ## CHANGELOG
 
