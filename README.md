@@ -146,6 +146,17 @@ Test.propTypes = {
 } 
 ```
 
+## Keep PropTypes's Comments
+If you want to keep PropTypes's comments, you must put the comments in the every PropTypes's end, like:
+```javascript
+Test.propTypes = {
+  students: PropTypes.array, // students
+  teacher: PropTypes.shape({
+     name: PropTypes.string, // teacher 's name
+  }) // teacher
+} 
+```
+
 ## Extension Settings
 
 This extension contributes the following settings:
