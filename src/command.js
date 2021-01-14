@@ -25,7 +25,7 @@ function generate() {
 	// merge config to options
 	const options = Object.assign({}, setting.getConfig(), { name: componentName });
 	actionHelper.generatePropTypesCode(ast, options)
-		.then(({ code, propTypesNode, componentNode }) => {
+		.then(({ code, propTypesNode, componentNode, defaultPropsNode }) => {
 			return editor.edit(editBuilder => {
 				if (propTypesNode) {
 					// replace old object
@@ -55,26 +55,25 @@ function generate() {
 			});
 		})
 		.then((lastResult) => {
-			if (options.codeStyle !== 'disable') {
+			if (options.autoImport !== 'disable') {
 				let { importNode, requireNode } = actions.findImportOrRequireModuleNode(ast, options);
 				let firstBody = ast.body[0];
 				let importCode = codeBuilder.buildImportCode(options);
 				if (!importNode && !requireNode && firstBody && importCode) {
-					if (options.autoImport && options.autoImport !== 'disabled') {
-						return editor.edit(editBuilder => {
-							let insertPosition = new vscode.Position(firstBody.loc.start.line - 1, 0);
-							editBuilder.insert(insertPosition, importCode + '\n');
-						}).then(() => {
-							return lastResult;
-						});
-					}
+					return editor.edit(editBuilder => {
+						let insertPosition = new vscode.Position(firstBody.loc.start.line - 1, 0);
+						return editBuilder.insert(insertPosition, importCode + '\n');
+					}).then(() => {
+						return lastResult;
+					});
 				}
 			}
 			return lastResult;
 		}).then(({ propTypesNode, componentNode }) => {
 		return codeBuilder.getEditRanges(document.getText(), options).then(({ ranges, node }) => {
+			vscode.window.showInformationMessage("准备插入代码片段" + JSON.stringify(ranges));
 			if (node && ranges.length > 0) {
-				if (setting.getConfig('afterFormat')) {
+				if (options.afterFormat) {
 					let nodeRange = rangeUtils.getVsCodeRangeByLoc(node.loc);
 					editor.selection = new vscode.Selection(nodeRange.start, nodeRange.end);
 					return vscode.commands.executeCommand('editor.action.formatSelection').then(() => true);

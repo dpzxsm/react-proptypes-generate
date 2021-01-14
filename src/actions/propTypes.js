@@ -232,7 +232,7 @@ function findPropTypesInObjectNode(objectNode, comments = []) {
 			if (propType) {
 				let start = value.range[1];
 				let end = (i === properties.length - 1) ? objectNode.range[1] : properties[i + 1].value.range[0];
-				let commentNode = comments.find(comment => comment.range[0] > start && comment.range[1] < end);
+				let commentNode = comments.find(comment => comment.range[0] >= start && comment.range[1] <= end);
 				commentNode && (propType.comment = commentNode.value);
 				propTypes.push(propType)
 			}

@@ -144,8 +144,8 @@ function getEditRanges(code, options) {
 			let objectNode;
 			if (node.type === 'ClassProperty') {
 				objectNode = node.value;
-			} else if (node.type === 'AssignmentExpression') {
-				objectNode = node.right;
+			} else if (node.type === 'ExpressionStatement' && node.expression.type === 'AssignmentExpression') {
+				objectNode = node.expression.right;
 			}
 			if (objectNode && objectNode.type === 'ObjectExpression') {
 				objectNode.properties.forEach((item) => {

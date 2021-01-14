@@ -235,3 +235,8 @@ Command Line can config the following settings:
 
 ### [v1.6.7]
 - Add `lint-stage` Full Support
+
+### [v1.7.0]
+- Support keep PropTypes's comments
+- Add `include` and `exclude` settings for `rpg.config.json`
+- Fix a bug that can't merge old PropTypes
