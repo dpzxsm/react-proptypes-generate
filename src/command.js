@@ -71,7 +71,6 @@ function generate() {
 			return lastResult;
 		}).then(({ propTypesNode, componentNode }) => {
 		return codeBuilder.getEditRanges(document.getText(), options).then(({ ranges, node }) => {
-			vscode.window.showInformationMessage("准备插入代码片段" + JSON.stringify(ranges));
 			if (node && ranges.length > 0) {
 				if (options.afterFormat) {
 					let nodeRange = rangeUtils.getVsCodeRangeByLoc(node.loc);
