@@ -3,7 +3,7 @@ const path = require("path");
 const fs = require("fs");
 const Promise = require("bluebird");
 const glob = require("glob");
-const globToRegex = require("glob-to-regexp");
+const minimatch = require("minimatch");
 const { program } = require('commander');
 const astHelper = require("../src/astHelper");
 const actions = require("../src/actions");
@@ -109,8 +109,8 @@ function parseAndGenerate(builder) {
 	if (config) {
 		let include = config.include || [];
 		let exclude = config.exclude || [];
-		let includeMatch = include.length > 0 ? include.some(glob => globToRegex(glob).test(normalizePath)) : true;
-		let excludeMatch = include.length > 0 ? exclude.some(glob => globToRegex(glob).test(normalizePath)) : false;
+		let includeMatch = include.length > 0 ? include.some(glob => minimatch(normalizePath, glob)) : true;
+		let excludeMatch = include.length > 0 ? exclude.some(glob => minimatch(normalizePath, glob)) : false;
 		if (!includeMatch || excludeMatch) {
 			console.log(filePath + ' is be excluded !');
 			return Promise.resolve(0);
