@@ -259,3 +259,6 @@ Command Line can config the following settings:
 - Support keep PropTypes's comments
 - Add `include` and `exclude` settings for `rpg.config.json`
 - Fix a bug that can't merge old PropTypes
+
+### [v1.7.1]
+- Fix a bug that glob path match in the `command line`

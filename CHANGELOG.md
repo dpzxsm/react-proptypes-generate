@@ -59,6 +59,17 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ### [v1.6.2]
 - Support for destructured `shape` type
 
-### [v1.6.4]
+### [v1.6.3]
 - Add `semicolon` settings for code style;
-- Support `lint-staged` for automatic generation;
+- Command Line Support `rpg.config.json` for `project` command; 
+
+### [v1.6.7]
+- Add `lint-stage` Full Support
+
+### [v1.7.0]
+- Support keep PropTypes's comments
+- Add `include` and `exclude` settings for `rpg.config.json`
+- Fix a bug that can't merge old PropTypes
+
+### [v1.7.1]
+- Fix a bug that glob path match in the `command line`
