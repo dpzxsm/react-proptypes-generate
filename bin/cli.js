@@ -137,7 +137,7 @@ function parseAndGenerate(builder) {
 			console.log(filePath + ' ' + name + ' Generated Success!');
 			return total + 1;
 		}).catch(error => {
-			console.error(error);
+			console.log(styles.red, filePath + ' ' + name + ' ' + error.message)
 			return total;
 		});
 	}, 0);
@@ -181,9 +181,7 @@ function generatePropTypes(builder) {
 				}
 			}
 			return result;
-		}).catch(error => {
-			console.error(error)
-		});
+		})
 }
 
 function readConfig() {
