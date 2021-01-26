@@ -16,10 +16,24 @@ function findPropTypes({ componentNode, propTypesNode, defaultPropsNode }, optio
 		actions.push(findPropTypesInPropTypeNode(propTypesNode, comments));
 	}
 	return Promise.all(actions).then((results) => {
-		return results.reduce((total = [], current = []) => {
-			return propTypesHelper.customMergePropTypes(total, current);
-		}, [])
-			.sort(arrayUtils.sortByKey());
+		if (options.noDiffMergeOld) {
+			return results.reduce((total = [], current = []) => {
+				return propTypesHelper.customMergePropTypes(total, current);
+			}, []).sort(arrayUtils.sortByKey());
+		} else {
+			let newPropTypes = results.slice(0, 2).reduce((total = [], current = []) => {
+				return propTypesHelper.customMergePropTypes(total, current);
+			}, []).sort(arrayUtils.sortByKey());
+			let oldPropTypes = results[2] || [];
+			return newPropTypes.map(item => {
+				let updateItem = oldPropTypes.find(updateItem => item.name === updateItem.name);
+				if (updateItem) {
+					return propTypesHelper.customMergePropTypes(item, updateItem);
+				} else {
+					return item;
+				}
+			});
+		}
 	});
 }
 
@@ -234,7 +248,7 @@ function findPropTypesInObjectNode(objectNode, comments = []) {
 				let end = (i === properties.length - 1) ? objectNode.range[1] : properties[i + 1].value.range[0];
 				let commentNode = comments.find(comment => comment.range[0] >= start && comment.range[1] <= end);
 				commentNode && (propType.comment = commentNode.value);
-				propTypes.push(propType)
+				propTypes.push(propType);
 			}
 		}
 	}

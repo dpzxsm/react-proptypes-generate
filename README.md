@@ -169,6 +169,7 @@ This extension contributes the following settings:
 * `propTypes.semicolon`: If true, there will be a semicolon after PropType statement
 * `propTypes.afterFormat`: If true, after generate propTypes, trigger vscode's formatting for PropTypes(boolean)
 * `propTypes.noMergeOld`: Defaults is merge old PropTypes, if true, will generate new PropTypes(boolean)
+* `propTypes.noDiffMergeOld`: If true, old PropTypes different with new PropTypes will be deleted, only used when `noMergeOld` is false(boolean)
 * `propTypes.noShape`: Defaults is generate shape type, if true, will generate object type(boolean)
 * `propTypes.arrayLike`: If true, some shape type which is similar to Array will be set array type instead(boolean)
 * `isRequired`: If true, all PropTypes is will be set to isRequired(boolean)
@@ -184,6 +185,7 @@ Command Line can config the following settings:
 * `trailingComma`: Controls the printing of trailing commas in object literals, array expressions and function parameters(boolean)
 * `semicolon`: If true, there will be a semicolon after PropType statement
 * `noMergeOld`: Defaults is merge old PropTypes, if true, will generate new PropTypes(boolean)
+* `noDiffMergeOld`: If true, old PropTypes different with new PropTypes will be deleted, only used when `noMergeOld` is false(boolean)
 * `noShape`: Defaults is generate shape type, if true, will generate object type(boolean)
 * `arrayLike`: If true, some shape type which is similar to Array will be set array type instead(boolean)
 * `isRequired`: If true, all PropTypes is will be set to isRequired(boolean)

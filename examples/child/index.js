@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 export const Test = React.memo((props) =>  {
   let { school: schoolAlias = "schoolName", info = { name: "test" }, age = 33, students = [] } = props;
   if(info.year === 2020){
@@ -11,7 +12,7 @@ export const Test = React.memo((props) =>  {
   </div>
 })
 
-export const Test = React.memo(function (props){
+export const Test2 = React.memo(function (props){
   let { school: schoolAlias = "schoolName", info = { name: "test" }, age = 33, students = [] } = props;
   if(info.year === 2020){
     console.log("will generate year type as number");
@@ -23,4 +24,3 @@ export const Test = React.memo(function (props){
     {students.map((student, index) =><div key={index}>{item.name}</div>)}
   </div>
 })
-

@@ -98,6 +98,11 @@
                     "default": false,
                     "description": "Defaults is merge old PropTypes, if true, will generate new PropTypes"
                 },
+                "propTypes.noDiffMergeOld": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "If true, old PropTypes different with new PropTypes will be deleted, only used when `noMergeOld` is false"
+                },
                 "propTypes.noShape": {
                     "type": "boolean",
                     "default": false,
