@@ -181,6 +181,8 @@ function generatePropTypes(builder) {
 				}
 			}
 			return result;
+		}).catch(error => {
+			console.error(error)
 		});
 }
 
