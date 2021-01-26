@@ -262,3 +262,6 @@ Command Line can config the following settings:
 
 ### [v1.7.1]
 - Fix a bug that glob path match in the `command line`
+
+### [v1.7.2]
+- Fix `include` and `exclude` path match bug in the `lint-stage`

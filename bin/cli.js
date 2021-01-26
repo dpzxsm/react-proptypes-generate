@@ -105,7 +105,8 @@ function getProjectFiles(builder) {
 function parseAndGenerate(builder) {
 	const { filePath, componentName, config } = builder;
 	let normalizePath = path.normalize(filePath);
-
+	// glob匹配必须是相对路径
+	normalizePath = path.relative(process.cwd(), normalizePath)
 	if (config) {
 		let include = config.include || [];
 		let exclude = config.exclude || [];
