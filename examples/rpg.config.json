@@ -9,8 +9,6 @@
   "semicolon": false,
   "arrayLike": true,
   "isRequired": true,
-  "include": [
-    "child/**/*"
-  ],
+  "include": [],
   "exclude": []
 }
