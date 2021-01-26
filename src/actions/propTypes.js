@@ -17,10 +17,6 @@ function findPropTypes({ componentNode, propTypesNode, defaultPropsNode }, optio
 	}
 	return Promise.all(actions).then((results) => {
 		if (options.noDiffMergeOld) {
-			return results.reduce((total = [], current = []) => {
-				return propTypesHelper.customMergePropTypes(total, current);
-			}, []).sort(arrayUtils.sortByKey());
-		} else {
 			let newPropTypes = results.slice(0, 2).reduce((total = [], current = []) => {
 				return propTypesHelper.customMergePropTypes(total, current);
 			}, []).sort(arrayUtils.sortByKey());
@@ -33,6 +29,10 @@ function findPropTypes({ componentNode, propTypesNode, defaultPropsNode }, optio
 					return item;
 				}
 			});
+		} else {
+			return results.reduce((total = [], current = []) => {
+				return propTypesHelper.customMergePropTypes(total, current);
+			}, []).sort(arrayUtils.sortByKey());
 		}
 	});
 }
