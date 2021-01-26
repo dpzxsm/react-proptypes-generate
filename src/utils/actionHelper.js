@@ -29,7 +29,7 @@ function generatePropTypesCode(ast, options) {
 				} else if (propTypesNode.type === 'ClassProperty') {
 					options.codeStyle = 'class';
 				}
-			} else if (componentNode.type === 'FunctionDeclaration' || componentNode.type === 'ArrowFunctionExpression') {
+			} else if (componentNode.type === 'FunctionExpression' || componentNode.type === 'FunctionDeclaration' || componentNode.type === 'ArrowFunctionExpression') {
 				options.codeStyle = 'default';
 			}
 			return {

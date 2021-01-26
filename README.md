@@ -265,3 +265,4 @@ Command Line can config the following settings:
 
 ### [v1.7.2]
 - Fix `include` and `exclude` path match bug in the `lint-stage`
+- Fix a bug that `FunctionExpression` Component is distinguish as `Class` Component
