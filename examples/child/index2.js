@@ -23,5 +23,4 @@ Test.Item2 = React.memo(function (props) {
 	</div>;
 });
 
-export
-Test;
+export Test;
