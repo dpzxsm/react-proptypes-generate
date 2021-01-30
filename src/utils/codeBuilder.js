@@ -44,14 +44,14 @@ function buildMemberExpression(item) {
 		if (item.type === 'shape' || item.type === 'exact') {
 			argExpressions.push(buildObjectExpression(item.childTypes));
 		} else if (['arrayOf', 'objectOf', 'instanceOf'].indexOf(item.type) !== -1) {
-			let singleType = buildMemberExpression(item.childTypes[0]);
+			let singleType = buildMemberExpression(item.childTypes.find(item => !item.name));
 			singleType && argExpressions.push(singleType);
 		} else if (item.type === 'oneOf') {
 			if (item.ast) {
 				argExpressions.push(item.ast);
 			}
 		} else if (item.type === 'oneOfType') {
-			argExpressions.push(buildArrayExpression(item.childTypes));
+			argExpressions.push(buildArrayExpression(item.childTypes.filter(item => !item.name)));
 		} else {
 			return null;
 		}
