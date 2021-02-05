@@ -50,6 +50,7 @@ If you want to every project have different config, you can create a json file n
   "autoImport": "ES6",
   "codeStyle": "default",
   "noMergeOld": false,
+  "mergeOldIfExist": true,
   "noShape": false,
   "tabWidth": 2,
   "quote": "double",
@@ -169,7 +170,7 @@ This extension contributes the following settings:
 * `propTypes.semicolon`: If true, there will be a semicolon after PropType statement
 * `propTypes.afterFormat`: If true, after generate propTypes, trigger vscode's formatting for PropTypes(boolean)
 * `propTypes.noMergeOld`: Defaults is merge old PropTypes, if true, will generate new PropTypes(boolean)
-* `propTypes.noDiffMergeOld`: If true, old PropTypes different with new PropTypes will be deleted, only used when `noMergeOld` is false(boolean)
+* `propTypes.mergeOldIfExist`: If true, old PropTypes different with new PropTypes will be deleted, only used when `noMergeOld` is false(boolean)
 * `propTypes.noShape`: Defaults is generate shape type, if true, will generate object type(boolean)
 * `propTypes.arrayLike`: If true, some shape type which is similar to Array will be set array type instead(boolean)
 * `isRequired`: If true, all PropTypes is will be set to isRequired(boolean)
@@ -185,7 +186,7 @@ Command Line can config the following settings:
 * `trailingComma`: Controls the printing of trailing commas in object literals, array expressions and function parameters(boolean)
 * `semicolon`: If true, there will be a semicolon after PropType statement
 * `noMergeOld`: Defaults is merge old PropTypes, if true, will generate new PropTypes(boolean)
-* `noDiffMergeOld`: If true, old PropTypes different with new PropTypes will be deleted, only used when `noMergeOld` is false(boolean)
+* `mergeOldIfExist`: If true, old PropTypes different with new PropTypes will be deleted, only used when `noMergeOld` is false(boolean)
 * `noShape`: Defaults is generate shape type, if true, will generate object type(boolean)
 * `arrayLike`: If true, some shape type which is similar to Array will be set array type instead(boolean)
 * `isRequired`: If true, all PropTypes is will be set to isRequired(boolean)
@@ -268,3 +269,7 @@ Command Line can config the following settings:
 ### [v1.7.2]
 - Fix `include` and `exclude` path match bug in the `lint-stage`
 - Fix a bug that `FunctionExpression` Component is distinguish as `Class` Component
+
+### [v1.7.3]
+- Fix a bug that `'arrayOf', 'objectOf', 'instanceOf'` when merge old PropTypes
+- Add `mergeOldIfExist` settings for  only merge exist PropTypes

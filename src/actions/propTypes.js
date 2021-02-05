@@ -16,7 +16,7 @@ function findPropTypes({ componentNode, propTypesNode, defaultPropsNode }, optio
 		actions.push(findPropTypesInPropTypeNode(propTypesNode, comments));
 	}
 	return Promise.all(actions).then((results) => {
-		if (options.noDiffMergeOld) {
+		if (options.mergeOldIfExist) {
 			let newPropTypes = results.slice(0, 2).reduce((total = [], current = []) => {
 				return propTypesHelper.customMergePropTypes(total, current);
 			}, []).sort(arrayUtils.sortByKey());
