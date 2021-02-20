@@ -134,11 +134,11 @@ function findPropTypesNode(ast, options) {
 			let left = node.left;
 			let right = node.right;
 			if (left && left.type === 'MemberExpression'
-				&& left.object.type === 'Identifier'
+				&& (left.object.type === 'Identifier' || left.object.type === 'MemberExpression')
 				&& left.property.type === 'Identifier'
-				&& left.object.name === name
 				&& left.property.name === (alias || 'propTypes')
 				&& right.type === 'ObjectExpression'
+				&& recast.print(left.object).code === name
 			) {
 				propTypesNode = path.parentPath.node;
 			}
