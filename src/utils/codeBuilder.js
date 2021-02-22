@@ -127,10 +127,10 @@ function buildImportCode(options) {
 		let ast = variableDeclaration('const', [variableDeclarator(id('PropTypes'), callExpression(id('require'), [
 			literal('prop-types')
 		]))]);
-		return recast.prettyPrint(ast, setting.getCodeStyle(options)).code;
+		return recast.prettyPrint(ast, setting.getCodeStyle(options)).code.replace(/;$/, "") + (options.semicolon ? ";" : "");
 	} else if (options.autoImport === 'ES6') {
 		let ast = importDeclaration([importDefaultSpecifier(id('PropTypes'))], literal('prop-types'), 'value');
-		return recast.prettyPrint(ast, setting.getCodeStyle(options)).code;
+		return recast.prettyPrint(ast, setting.getCodeStyle(options)).code.replace(/;$/, "") + (options.semicolon ? ";" : "");
 	} else {
 		return '';
 	}
