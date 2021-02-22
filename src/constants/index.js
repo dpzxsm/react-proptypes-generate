@@ -30,8 +30,6 @@ const specialTypes = [
 
 const arrayFunctions = [
   "concat",
-  "copyWithin",
-  "entries",
   "every",
   "fill",
   "filter",
@@ -43,7 +41,6 @@ const arrayFunctions = [
   "includes",
   "indexOf",
   "join",
-  "keys",
   "lastIndexOf",
   "map",
   "pop",
@@ -56,11 +53,7 @@ const arrayFunctions = [
   "some",
   "sort",
   "splice",
-  "toLocaleString",
-  "toSource",
-  "toString",
   "unshift",
-  "values",
 ];
 
 exports.types = types;
