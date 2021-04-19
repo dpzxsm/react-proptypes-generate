@@ -77,3 +77,9 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ### [v1.7.2]
 - Fix `include` and `exclude` path match bug in the `lint-stage`
 
+### [v1.7.3]
+- Fix a bug that `'arrayOf', 'objectOf', 'instanceOf'` when merge old PropTypes
+- Add `mergeOldIfExist` settings for  only merge exist PropTypes
+
+### [v1.7.5]
+- Fix `Command Line` can't be used in the Mac's OS

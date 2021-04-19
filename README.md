@@ -273,3 +273,6 @@ Command Line can config the following settings:
 ### [v1.7.3]
 - Fix a bug that `'arrayOf', 'objectOf', 'instanceOf'` when merge old PropTypes
 - Add `mergeOldIfExist` settings for  only merge exist PropTypes
+
+### [v1.7.5]
+- Fix `Command Line` can't be used in the Mac's OS
