@@ -2,7 +2,7 @@
     "name": "react-proptypes-generate",
     "displayName": "React PropTypes Generate",
     "description": "Auto generate react's propTypes",
-    "version": "1.7.5",
+    "version": "1.7.6",
     "publisher": "suming",
     "author": "suming",
     "license": "MIT",
@@ -117,6 +117,11 @@
                     "type": "boolean",
                     "default": false,
                     "description": "If true, all PropTypes is will be set to isRequired"
+                },
+                "propTypes.sort": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "If true, all PropTypes is sort by name"
                 }
             }
         }

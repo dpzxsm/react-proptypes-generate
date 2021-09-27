@@ -10,6 +10,7 @@
   "semicolon": false,
   "arrayLike": false,
   "isRequired": true,
+  "sort": true,
   "include": [],
   "exclude": []
 }
