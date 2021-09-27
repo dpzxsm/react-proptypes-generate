@@ -77,7 +77,7 @@ function findPropTypesByPropsIdentity(ast, options) {
   if (identity) {
     // 可能是 props or this.props
     visitOptions.visitMemberExpression = function (path) {
-      let { propType } = getPropTypeByMemberExpression(path, [identity]);
+      let { propType } = getPropTypeByMemberExpression(path, [identity], options);
       if (propType) {
         propTypes = propTypesHelper.customMergePropTypes(propTypes, [propType], options.sort);
       }
@@ -96,7 +96,7 @@ function findPropTypesByPropsIdentity(ast, options) {
           && initNode.property.name === 'props') ||
         (initNode.type === 'Identifier' && initNode.name === identity)
       ) {
-        let newPropTypes = findAndCompletePropTypes(findBlockStatement(path), findPropTypesInObjectPattern(idNode));
+        let newPropTypes = findAndCompletePropTypes(findBlockStatement(path), findPropTypesInObjectPattern(idNode), options);
         propTypes = propTypesHelper.customMergePropTypes(propTypes, newPropTypes, options.sort);
       }
     }
@@ -339,7 +339,7 @@ function findBlockStatement(path) {
   }
 }
 
-function getPropTypeByMemberExpression(path, ids) {
+function getPropTypeByMemberExpression(path, ids, options) {
   let code = recast.print(path.node).code;
   let regex = new RegExp(`^(${ids.join('|')})((\\??\\.[a-zA-Z_$][a-zA-Z0-9_$]*)+)$`);
   let match = regex.exec(code);
@@ -359,10 +359,10 @@ function getPropTypeByMemberExpression(path, ids) {
         if (parentNode.type === 'VariableDeclarator') {
           if (parentNode.id.type === 'Identifier') {
             propType.id = parentNode.id.name;
-            propType = findAndCompletePropTypes(findBlockStatement(path), [propType])[0];
+            propType = findAndCompletePropTypes(findBlockStatement(path), [propType], options)[0];
           } else if (parentNode.id.type === 'ObjectPattern') {
             propType.type = 'shape';
-            propType.childTypes = findAndCompletePropTypes(findBlockStatement(path), findPropTypesInObjectPattern(parentNode.id));
+            propType.childTypes = findAndCompletePropTypes(findBlockStatement(path), findPropTypesInObjectPattern(parentNode.id), options);
           }
         }
         firstPropType = propType;
@@ -414,7 +414,7 @@ function findAndCompletePropTypes(ast, propTypes, options) {
       this.traverse(path);
     };
     let visitMemberExpression = function (path) {
-      let { name, propType } = getPropTypeByMemberExpression(path, ids);
+      let { name, propType } = getPropTypeByMemberExpression(path, ids, options);
       if (name && propType) {
         let updatePropType = newPropTypes.find(item => item.id === name);
         if (updatePropType) {
