@@ -18,7 +18,7 @@ function findPropTypes({ componentNode, propTypesNode, defaultPropsNode }, optio
   return Promise.all(actions).then((results) => {
     if (options.mergeOldIfExist) {
       let newPropTypes = results.slice(0, 2).reduce((total = [], current = []) => {
-        return propTypesHelper.customMergePropTypes(total, current);
+        return propTypesHelper.customMergePropTypes(total, current, options.sort);
       }, []);
       if (options.sort) {
         newPropTypes.sort(arrayUtils.sortByKey());
@@ -27,14 +27,14 @@ function findPropTypes({ componentNode, propTypesNode, defaultPropsNode }, optio
       return newPropTypes.map(item => {
         let updateItem = oldPropTypes.find(updateItem => item.name === updateItem.name);
         if (updateItem) {
-          return propTypesHelper.customMergePropTypes(item, updateItem);
+          return propTypesHelper.customMergePropTypes(item, updateItem, options.sort);
         } else {
           return item;
         }
       });
     } else {
       let newPropTypes = results.reduce((total = [], current = []) => {
-        return propTypesHelper.customMergePropTypes(total, current);
+        return propTypesHelper.customMergePropTypes(total, current, options.sort);
       }, []);
       if (options.sort) {
         newPropTypes.sort(arrayUtils.sortByKey());
@@ -56,7 +56,7 @@ function findPropTypesByPropsIdentity(ast, options) {
       identity = ast.params[0].name;
     } else if (firstParams.type === 'ObjectPattern') {
       let newPropTypes = findAndCompletePropTypes(ast, findPropTypesInObjectPattern(firstParams, options));
-      propTypes = propTypesHelper.customMergePropTypes(propTypes, newPropTypes);
+      propTypes = propTypesHelper.customMergePropTypes(propTypes, newPropTypes, options.sort);
     }
 
   } else if (ast.type === 'ClassDeclaration') {
@@ -68,7 +68,7 @@ function findPropTypesByPropsIdentity(ast, options) {
         && node.value.type === 'FunctionExpression'
       ) {
         let newPropTypes = findPropTypesByPropsIdentity(node.value, options);
-        propTypes = propTypesHelper.customMergePropTypes(propTypes, newPropTypes);
+        propTypes = propTypesHelper.customMergePropTypes(propTypes, newPropTypes, options.sort);
       }
       this.traverse(path);
     };
@@ -79,7 +79,7 @@ function findPropTypesByPropsIdentity(ast, options) {
     visitOptions.visitMemberExpression = function (path) {
       let { propType } = getPropTypeByMemberExpression(path, [identity]);
       if (propType) {
-        propTypes = propTypesHelper.customMergePropTypes(propTypes, [propType]);
+        propTypes = propTypesHelper.customMergePropTypes(propTypes, [propType], options.sort);
       }
       this.traverse(path);
     };
@@ -97,7 +97,7 @@ function findPropTypesByPropsIdentity(ast, options) {
         (initNode.type === 'Identifier' && initNode.name === identity)
       ) {
         let newPropTypes = findAndCompletePropTypes(findBlockStatement(path), findPropTypesInObjectPattern(idNode));
-        propTypes = propTypesHelper.customMergePropTypes(propTypes, newPropTypes);
+        propTypes = propTypesHelper.customMergePropTypes(propTypes, newPropTypes, options.sort);
       }
     }
     this.traverse(path);
@@ -420,7 +420,7 @@ function findAndCompletePropTypes(ast, propTypes) {
         if (updatePropType) {
           // 这时候说明肯定是复杂类型，所以用shape
           updatePropType.type = 'shape';
-          updatePropType.childTypes = propTypesHelper.customMergePropTypes(updatePropType.childTypes, [propType]);
+          updatePropType.childTypes = propTypesHelper.customMergePropTypes(updatePropType.childTypes, [propType], true);
         }
       }
       this.traverse(path);
@@ -436,7 +436,7 @@ function findAndCompletePropTypes(ast, propTypes) {
             if (childTypes.length > 0) {
               // 这时候说明肯定是复杂类型，所以用shape
               updatePropType.type = 'shape';
-              updatePropType.childTypes = propTypesHelper.customMergePropTypes(updatePropType.childTypes, childTypes);
+              updatePropType.childTypes = propTypesHelper.customMergePropTypes(updatePropType.childTypes, childTypes, true);
             }
           }
         }

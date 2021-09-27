@@ -14,7 +14,7 @@ function updatePropTypeByNode(node, propType) {
     if (properties.length > 0) {
       propType.type = 'shape';
     } else {
-      propType.type = 'object'
+      propType.type = 'object';
     }
     for (let i = 0; i < properties.length; i++) {
       let key = properties[i].key;
@@ -38,7 +38,7 @@ function updatePropTypeByNode(node, propType) {
       propType.type = 'number';
     }
   }
-  return propType
+  return propType;
 }
 
 function updatePropTypeFromCode(bean, code) {
@@ -63,25 +63,28 @@ function updatePropTypeFromCode(bean, code) {
 }
 
 // 自定义合并数组
-function customMergeChildTypes(target, source) {
+function customMergeChildTypes(target, source, sort) {
   const destination = target.slice();
   const targetNames = target.map(item => item.name);
-  source.forEach((item, index) => {
+  source.forEach(item => {
     if (targetNames.indexOf(item.name) !== -1) {
       let oldTypeIndex = destination.findIndex(dest => dest.name === item.name);
-      destination[oldTypeIndex] = customMergePropTypes(destination[oldTypeIndex], item)
+      destination[oldTypeIndex] = customMergePropTypes(destination[oldTypeIndex], item);
     } else {
       destination.push(item);
     }
   });
   // 合并进行排序
-  return destination.sort(arrayUtils.sortByKey('name'));
+  if (sort) {
+    destination.sort(arrayUtils.sortByKey());
+  }
+  return destination;
 }
 
 // 合并两个PropType对象
-function customMergePropTypes(target, source) {
+function customMergePropTypes(target, source, sort) {
   let result = merge(target, source, {
-    arrayMerge: customMergeChildTypes
+    arrayMerge: (a, b) => customMergeChildTypes(a, b, sort)
   });
 
   if (result && !Array.isArray(result)) {
@@ -89,7 +92,7 @@ function customMergePropTypes(target, source) {
       // do nothing
     } else {
       // 修改合并后的对象的原型链
-      result.__proto__ = PropTypes.prototype
+      result.__proto__ = PropTypes.prototype;
     }
   }
   return result;
