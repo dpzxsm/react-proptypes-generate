@@ -69,7 +69,7 @@ function customMergeChildTypes(target, source, sort) {
   source.forEach(item => {
     if (targetNames.indexOf(item.name) !== -1) {
       let oldTypeIndex = destination.findIndex(dest => dest.name === item.name);
-      destination[oldTypeIndex] = customMergePropTypes(destination[oldTypeIndex], item);
+      destination[oldTypeIndex] = customMergePropTypes(destination[oldTypeIndex], item, sort);
     } else {
       destination.push(item);
     }

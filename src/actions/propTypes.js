@@ -55,7 +55,7 @@ function findPropTypesByPropsIdentity(ast, options) {
     if (firstParams.type === 'Identifier') {
       identity = ast.params[0].name;
     } else if (firstParams.type === 'ObjectPattern') {
-      let newPropTypes = findAndCompletePropTypes(ast, findPropTypesInObjectPattern(firstParams, options));
+      let newPropTypes = findAndCompletePropTypes(ast, findPropTypesInObjectPattern(firstParams, options), options);
       propTypes = propTypesHelper.customMergePropTypes(propTypes, newPropTypes, options.sort);
     }
 
@@ -394,7 +394,7 @@ function getPropTypeByMemberExpression(path, ids) {
 }
 
 
-function findAndCompletePropTypes(ast, propTypes) {
+function findAndCompletePropTypes(ast, propTypes, options) {
   let newPropTypes = propTypes.slice();
   let ids = newPropTypes
     .filter(item => !!item.id) // Must have id
@@ -420,7 +420,7 @@ function findAndCompletePropTypes(ast, propTypes) {
         if (updatePropType) {
           // 这时候说明肯定是复杂类型，所以用shape
           updatePropType.type = 'shape';
-          updatePropType.childTypes = propTypesHelper.customMergePropTypes(updatePropType.childTypes, [propType], true);
+          updatePropType.childTypes = propTypesHelper.customMergePropTypes(updatePropType.childTypes, [propType], options.sort);
         }
       }
       this.traverse(path);
@@ -432,11 +432,11 @@ function findAndCompletePropTypes(ast, propTypes) {
         if (id.type === 'ObjectPattern' && init.type === 'Identifier') {
           let updatePropType = newPropTypes.find(item => item.id === init.name);
           if (updatePropType) {
-            const childTypes = findAndCompletePropTypes(findBlockStatement(path), findPropTypesInObjectPattern(id));
+            const childTypes = findAndCompletePropTypes(findBlockStatement(path), findPropTypesInObjectPattern(id), options);
             if (childTypes.length > 0) {
               // 这时候说明肯定是复杂类型，所以用shape
               updatePropType.type = 'shape';
-              updatePropType.childTypes = propTypesHelper.customMergePropTypes(updatePropType.childTypes, childTypes, true);
+              updatePropType.childTypes = propTypesHelper.customMergePropTypes(updatePropType.childTypes, childTypes, options.sort);
             }
           }
         }
