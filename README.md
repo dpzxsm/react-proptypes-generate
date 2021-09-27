@@ -3,16 +3,20 @@
   Also a command line tool, you don’t have to be limited to use in vscode. If you want fully automatic PropTypes generation, You can also use with lint-staged in your project.
 
 ## Installation
+
+You have three type to use the plugin, optional installation as required。
+
 ### VS Code
-  Search react-proptypes-generate in Marketplace and install it.
+Search react-proptypes-generate in Marketplace and install it.
 
 ### Command Line
-If you want to use it directly on the command line, you can install cli by npm install.
+If you want to use it directly on the command line and not use the VS Code, you can install cli by npm install.
 ```
 npm install react-proptypes-generate -g
 ```
 
 ### Project with lint-staged
+If you want to auto generate PropTypes when `git` commit changes, you need to install lint-staged and husky for your project
 ```
     npm install --save-dev react-proptypes-generate lint-staged husky
     or
@@ -158,26 +162,7 @@ Test.propTypes = {
 } 
 ```
 
-## Extension Settings
-
-This extension contributes the following settings:
-
-* `propTypes.autoImport`: Auto import or require PropTypes module(disabled|commonJS|ES6)
-* `propTypes.codeStyle`: PropTypes Generate Style(default|class)
-* `propTypes.tabWidth`: Number of spaces the pretty-printer should use per tab for indentation (number)
-* `propTypes.quote`: Override the quotes used in string literals(single|double|auto|null)
-* `propTypes.trailingComma`: Controls the printing of trailing commas in object literals, array expressions and function parameters(boolean)
-* `propTypes.semicolon`: If true, there will be a semicolon after PropType statement
-* `propTypes.afterFormat`: If true, after generate propTypes, trigger vscode's formatting for PropTypes(boolean)
-* `propTypes.noMergeOld`: Defaults is merge old PropTypes, if true, will generate new PropTypes(boolean)
-* `propTypes.mergeOldIfExist`: If true, old PropTypes different with new PropTypes will be deleted, only used when `noMergeOld` is false(boolean)
-* `propTypes.noShape`: Defaults is generate shape type, if true, will generate object type(boolean)
-* `propTypes.arrayLike`: If true, some shape type which is similar to Array will be set array type instead(boolean)
-* `isRequired`: If true, all PropTypes is will be set to isRequired(boolean)
-
-## Command Line Settings
-
-Command Line can config the following settings:
+## Common settings
 
 * `autoImport`: Auto import or require PropTypes module(disabled|commonJS|ES6)
 * `codeStyle`: PropTypes Generate Style(default|class)
@@ -190,6 +175,17 @@ Command Line can config the following settings:
 * `noShape`: Defaults is generate shape type, if true, will generate object type(boolean)
 * `arrayLike`: If true, some shape type which is similar to Array will be set array type instead(boolean)
 * `isRequired`: If true, all PropTypes is will be set to isRequired(boolean)
+* `sort`: If true, all PropTypes is sort by name(boolean)
+
+## Extension Special Settings
+
+This extension contributes the following settings:
+
+* `propTypes.afterFormat`: If true, after generate propTypes, trigger vscode's formatting for PropTypes(boolean)
+
+## Command Line Special Settings
+
+Command Line can config the following settings:
 * `include`: Match need generated files, only used in `fix` and `project`(array)
 * `exclude`: Match node need generated files, only used in `fix` and `project`(array)
 
